@@ -4,6 +4,9 @@ const router = express.Router();
 const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
 
+router.get("/" , (req,res)=> {
+    res.json({msg:"Users work!!!!!"})
+  })
 // authonication routes
 router.post('/login', authCtrl.login)
 
