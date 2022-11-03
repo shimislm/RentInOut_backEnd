@@ -7,10 +7,13 @@ const prodObj = {
   img: String,
   category: String,
 };
-const massageObj = {sentDate:{
-    type: Date,
-    default: Date.now(),
-}};
+const massageObj = {
+    sentDate:{
+        type: Date,
+        default: Date.now(),
+},
+messege: String,
+};
 const chatObj = {
   self: { name: String, data: String, user_id: String },
   other: { name: String, data: String, user_id: String },
