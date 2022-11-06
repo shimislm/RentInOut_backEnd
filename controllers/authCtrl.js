@@ -1,7 +1,6 @@
 const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
-// const jwt = require("jsonwebtoken");
 const { createToken } = require("../helpers/userHelper");
 exports.authCtrl = {
     signUp: async(req, res) => {

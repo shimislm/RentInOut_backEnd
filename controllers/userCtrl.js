@@ -9,7 +9,6 @@ exports.userCtrl = {
   checkToken: async (req, res) => {
     res.json(req.tokenData);
   },
-
   info: async (req, res) => {
     try {
       let userInfo = await UserModel.findOne(
@@ -54,7 +53,7 @@ exports.userCtrl = {
       if (userID == config.superID) {
         return res
           .status(401)
-          .json({ msg: "You cant change superadmin to user" });
+          .json({ msg: "You cant change Superadmin to user" });
       }
       let data = await UserModel.updateOne(
         { _id: userID },
@@ -108,7 +107,7 @@ exports.userCtrl = {
       } else {
         data = await UserModel.deleteOne({
           _id: userID,
-          user_id: req.tokenData._id,
+          userID: req.tokenData._id,
         });
       }
       res.json(data);
@@ -123,18 +122,21 @@ exports.userCtrl = {
       return res.status(400).json({ msg: "Need to send valid body" });
     }
     try {
+      const user = await UserModel.findOne({ _id: userID });
       let userID = req.params.idEdit;
       if (userID == config.superID) {
-        return res.status(401).json({ msg: "You cant update superadmin" });
+        return res.status(401).json({ msg: "You cant update Superadmin" });
       }
-      let data = await UserModel.updateOne(
-        {
+      if (user.role === "admin") {
+        data = await UserModel.updateOne({ _id: userID });
+      } else {
+        data = await UserModel.updateOne({
           _id: userID,
-          user_id: req.tokenData._id,
-        },
-        req.body
-      );
+          userID: req.tokenData._id,
+        }, req.body);
+
       res.json(data);
+      }
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
