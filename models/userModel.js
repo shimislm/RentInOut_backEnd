@@ -1,71 +1,40 @@
-const mongoose = require("mongoose");
 
-const prodObj = {
-  user_id: String,
-  renatl_date: Date,
-  title: String,
-  img: String,
-  category: String,
-};
-const massageObj = {
-    sentDate:{
-        type: Date,
-        default: Date.now(),
-},
-messege: String,
-};
-const chatObj = {
-  self: { name: String, data: String, user_id: String },
-  other: { name: String, data: String, user_id: String },
-  messeges_ar: { 
-    type: [massageObj],
-    default: [] },
-};
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   fullName: {
     firstName: String,
-    LastName: String,
+    lastName: String,
   },
   email: String,
   password: String,
+  password_changed: Date,
   phone: String,
   profile_img: String,
   cover_img: String,
-
-  role: {
-    type: String,
-    default: "user",
-  },
-  date_created: {
-    type: Date,
-    default: Date.now(),
-  },
+  location: String,
   birtdate: Date,
-  active: Boolean,
-  renk: Number,
+  role:{
+      type: String,
+      default: "user",
+  },
+  active:{
+    type: Boolean,
+    default: true
+  },
+  rank:{
+    type:Number,
+    default: 10
+  },
   bio: String,
   productsList: {
     type: [String],
-    default: [],
+    default: []
   },
-  location: String,
-  rented_products: {
-    type: [prodObj],
-    default: [],
-  },
-  clicked_products: {
-    type: [prodObj],
-    default: [],
-  },
-  liked_products: {
-    type: [prodObj],
-    default: [],
-  },
-  chat_ar: {
-    type: [chatObj],
-    default: [],
-  },
-});
+},
+{
+  timestamps: true
+}
+);
 
 exports.UserModel = mongoose.model("users", userSchema);

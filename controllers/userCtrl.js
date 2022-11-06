@@ -3,14 +3,16 @@ const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
-const router = express.Router();
 
 exports.userCtrl = {
   checkToken: async (req, res) => {
     res.json(req.tokenData);
   },
-  info: async (req, res) => {
+  infoById: async (req, res) => {
     try {
+      if(req.tokenData.role === "admin"){
+
+      }
       let userInfo = await UserModel.findOne(
         { _id: req.tokenData._id },
         { password: 0 }
@@ -22,7 +24,7 @@ exports.userCtrl = {
     }
   },
 
-  getList: async (req, res) => {
+  getUsersList: async (req, res) => {
     try {
       let data = await UserModel.find({}, { password: 0 }).limit(20);
       res.json(data);
