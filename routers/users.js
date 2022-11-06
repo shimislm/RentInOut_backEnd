@@ -16,7 +16,7 @@ router.post('/', authCtrl.signUp)
 
 router.get("/userList",authAdmin , userCtrl.getList)
 
-router.get("/count",authAdmin , userCtrl.count)
+router.get("/count",authAdmin , userCtrl.countUsers)
 
 router.get('/info', auth , userCtrl.info)
 

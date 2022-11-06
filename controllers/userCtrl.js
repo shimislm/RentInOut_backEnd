@@ -32,7 +32,7 @@ exports.userCtrl = {
     }
   },
 
-  count: async (req, res) => {
+  countUsers: async (req, res) => {
     try {
       let count = await UserModel.countDocuments({});
       res.json({ count });
@@ -129,7 +129,8 @@ exports.userCtrl = {
       }
       if (user.role === "admin") {
         data = await UserModel.updateOne({ _id: userID });
-      } else {
+      }
+      else {
         data = await UserModel.updateOne({
           _id: userID,
           userID: req.tokenData._id,
