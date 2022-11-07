@@ -51,6 +51,8 @@ exports.userCtrl = {
     }
   },
 
+ 
+
   countUsers: async (req, res) => {
     try {
       let count = await UserModel.countDocuments({});
@@ -72,7 +74,7 @@ exports.userCtrl = {
 
   changeRole: async (req, res) => {
     if (!req.body.role) {
-      return res.status(400).json({ msg: "Need to send role in body" });
+      return res.status(400).json({ msg: "Need to send role in body with json format" });
     }
 
     try {
