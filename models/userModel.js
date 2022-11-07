@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -14,31 +13,35 @@ const userSchema = new mongoose.Schema({
   cover_img: String,
   location: String,
   birthdate: Date,
-  role:{
-      type: String,
-      default: "user",
-      enum : ["user", "admin"]
+  role: {
+    type: String,
+    default: "user",
+    enum: ["user", "admin"],
   },
-  active:{
+  active: {
     type: Boolean,
-    default: true
+    default: true,
   },
-  rank:{
-    type:Number,
-    default: 10
+  rank: {
+    type: Number,
+    default: 10,
   },
-  bio:{
-    type:String,
-    default: ""
+  bio: {
+    type: String,
+    default: "",
   },
   productsList: {
     type: [String],
-    default: []
+    default: [],
   },
-},
-{
-  timestamps: true
-}
-);
+  craetedAt: {
+    type: Date,
+    default: new Date(Date.now() + 2 * 60 * 60 * 1000),
+  },
+  updatedAt: {
+    type: Date,
+    default: new Date(Date.now() + 2 * 60 * 60 * 1000),
+  },
+});
 
 exports.UserModel = mongoose.model("users", userSchema);
