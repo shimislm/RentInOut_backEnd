@@ -1,6 +1,8 @@
 const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
+const { UserModel } = require("../models/userModel")
 const { validatePost } = require("../validations/postValid");
+const _ = require("lodash")
 const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
@@ -108,40 +110,42 @@ exports.postCtrl = {
             let min = req.query.min || MIN;
             let searchReg = new RegExp(searchQ, "i");
             // http://localhost:3000/posts/search?s=board&min=10&max=21
-            let books = await PostModel.find({$and : [{ $or: [{ title: searchReg }, { info: searchReg }]},
-                {$and:[{price:{$gte:min}},{price:{$lte:max}}]}]})
+            let books = await PostModel.find({
+                $and: [{ $or: [{ title: searchReg }, { info: searchReg }] },
+                { $and: [{ price: { $gte: min } }, { price: { $lte: max } }] }]
+            })
                 .limit(perPage)
-        .skip((page - 1) * perPage)
+                .skip((page - 1) * perPage)
             res.json(books);
-}
-        catch (err) {
-    console.log(err);
-    res.status(500).json({ err: err });
-}
-    },
-changeActive: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-        return res.status(400).json({ msg: "Need to send active in body" });
-    }
-    try {
-        let postID = req.params.postID;
-        if (postID == config.superID) {
-            return res.status(401).json({ msg: "You cant change superadmin to user" });
         }
-        let data = await PostModel.updateOne({ _id: postID }, { active: req.body.active });
+        catch (err) {
+            console.log(err);
+            res.status(500).json({ err: err });
+        }
+    },
+    changeActive: async (req, res) => {
+        if (!req.body.active && req.body.active != false) {
+            return res.status(400).json({ msg: "Need to send active in body" });
+        }
+        try {
+            let postID = req.params.postID;
+            if (postID == config.superID) {
+                return res.status(401).json({ msg: "You cant change superadmin to user" });
+            }
+            let data = await PostModel.updateOne({ _id: postID }, { active: req.body.active });
 
-        //update the change time 
-        let post = await PostModel.findOne({ _id: postID })
-        post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
-        post.save()
+            //update the change time 
+            let post = await PostModel.findOne({ _id: postID })
+            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.save()
 
-        return res.json(data);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "err", err });
-    }
-},
-    singleInfo : async (req, res) => {
+            return res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    singleInfo: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         let sort = req.query.sort || "_id";
@@ -159,35 +163,85 @@ changeActive: async (req, res) => {
             res.status(500).json({ err: err });
         }
     },
-        changeRange: async (req, res) => {
-            if (!req.body.range && req.body.range != false) {
-                return res.status(400).json({ msg: "Need to send range in body" });
-            }
-            if (req.body.range != "long-term" && req.body.range != "short-term") {
-                console.log(typeof req.body.range)
-                return res.status(400).json({ msg: "Range must be long/short-term" });
-            }
-            try {
-                let postID = req.params.postID;
-                let data;
-                if (postID == config.superID) {
-                    return res.status(401).json({ msg: "You cant change superadmin to user" });
-                }
-                if (req.tokenData.role === "admin") {
-                    data = await PostModel.updateOne({ _id: postID }, { range: req.body.range });
-                }
-                else {
-                    data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id }, { range: req.body.range });
-                }
-                //update the change time 
-                let post = await PostModel.findOne({ _id: postID })
-                post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
-                post.save()
-                return res.json(data);
-            } catch (err) {
-                console.log(err);
-                res.status(500).json({ msg: "err", err });
-            }
+    changeRange: async (req, res) => {
+        if (!req.body.range && req.body.range != false) {
+            return res.status(400).json({ msg: "Need to send range in body" });
         }
-
+        if (req.body.range != "long-term" && req.body.range != "short-term") {
+            console.log(typeof req.body.range)
+            return res.status(400).json({ msg: "Range must be long/short-term" });
+        }
+        try {
+            let postID = req.params.postID;
+            let data;
+            if (postID == config.superID) {
+                return res.status(401).json({ msg: "You cant change superadmin to user" });
+            }
+            if (req.tokenData.role === "admin") {
+                data = await PostModel.updateOne({ _id: postID }, { range: req.body.range });
+            }
+            else {
+                data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id }, { range: req.body.range });
+            }
+            //update the change time 
+            let post = await PostModel.findOne({ _id: postID })
+            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.save()
+            return res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    // :(
+    likePost: async (req, res) => {
+        try {
+            let { fullName } = await UserModel.findOne({ _id: req.tokenData._id });
+            //creating an object from the user 
+            let user = {
+                user_id: req.tokenData._id,
+                profile: "https://cdn-icons-png.flaticon.com/128/1077/1077114.png",
+                fullName
+            }
+            let postID = req.params.postID;
+            let post = await PostModel.findOne({ _id: postID });
+            //need to check if the user already 
+            // if the user found in the array setup found true else false
+            const found = post.likes.some(el => el.user_id === req.tokenData._id);
+            if (!found) {
+                post.likes.push(user);
+                await post.save()
+                return res.status(201).json({ posts: post.likes, msg: "You like the post" })
+            }
+            // remove from post like the user. may take long time check with Yarin
+            _.remove(post.likes, (user) => user.user_id === req.tokenData._id)
+            // save it on mongoDB *doesn't work :((((*
+            await post.save()
+            res.status(201).json({ posts: post.likes, msg: "unlike the post" })
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    countLikes: async (req, res) => {
+        try {
+            let postID = req.params.postID;
+            let post = await PostModel.findOne({ _id: postID });
+            let likes = await post.likes;
+            res.json({ count: likes.length });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    topThreeLikes: async (req, res) => {
+        try {
+            let postID = req.params.postID;
+            let post = await PostModel.findOne({ _id: postID })
+            res.json({ likes: post.likes.splice(0, 3) })
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    }
 }
