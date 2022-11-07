@@ -1,5 +1,5 @@
-
 const mongoose = require("mongoose");
+// helper object for likes
 const likesObject = {
     user_id: String,
     profile: String,
@@ -9,7 +9,7 @@ const likesObject = {
     }
 }
 const postSchema = new mongoose.Schema({
-    postName: String,
+    title: String,
     info: String,
     img: String,
     range: {
@@ -18,7 +18,10 @@ const postSchema = new mongoose.Schema({
         default: 'short-term'
     },
     creator_id: String,
-    category_url: String,
+    category_url : {
+        type : String,
+        default : "skate"
+    },
     price: Number,
     type: {
         type: String,
@@ -35,14 +38,21 @@ const postSchema = new mongoose.Schema({
     },
     available_from: {
         type: Date,
-        default: Date.now()
+        default: new Date(Date.now() +2 * 60 * 60 * 1000)
     },
     location: String,
     likes:{
         type: Array(likesObject),
         default: []
+    },
+    craetedAt :{
+        type: Date,
+        default: new Date(Date.now() +2 * 60 * 60 * 1000)
+    },
+    updatedAt :{
+        type: Date,
+        default: new Date(Date.now() +2 * 60 * 60 * 1000)
     }
-},
-    { timestamps: true });
+});
 
-exports.UserModel = mongoose.model("users", userSchema);
+exports.PostModel = mongoose.model("posts", postSchema);

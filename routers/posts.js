@@ -1,14 +1,15 @@
 const express= require("express");
 const {auth , authAdmin} = require("../middlewares/auth");
-const { productCtrl } = require("../controllers/productCtrl");
+const { postCtrl } = require("../controllers/postCtrl");
 const router = express.Router();
 
-router.get("/",);
-router.put("/:postID",auth);
-router.delete("/:postID",auth);
-router.post("/",auth);
-router.get("/count",authAdmin);
-router.get("/countMyPosts",auth);
+router.get("/", postCtrl.getAll);
+router.post("/", auth , postCtrl.upload);
+router.put("/:postID", auth ,postCtrl.update);
+
+router.delete("/:postID", auth);
+router.get("/count", authAdmin);
+router.get("/countMyPosts", auth);
 router.get("/search",);
 router.patch("/changeActive/:postID",auth);
 router.get("/single/:postID",auth);
