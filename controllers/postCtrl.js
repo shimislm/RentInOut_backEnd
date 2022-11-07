@@ -1,8 +1,9 @@
+const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
 const { validatePost } = require("../validations/postValid");
 
 exports.postCtrl = {
-    getAll : async(req,res) =>{
+    getAll: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         let sort = req.query.sort || "_id";
@@ -12,7 +13,7 @@ exports.postCtrl = {
                 .find({})
                 .limit(perPage)
                 .skip((page - 1) * perPage)
-                .sort({[sort]:reverse})
+                .sort({ [sort]: reverse })
             res.json(posts);
         }
         catch (err) {
@@ -20,7 +21,7 @@ exports.postCtrl = {
             res.status(500).json({ err: err });
         }
     },
-    upload : async(req,res) =>{
+    upload: async (req, res) => {
         let validBody = validatePost(req.body);
         if (validBody.error) {
             return res.status(400).json(validBody.error.details)
@@ -36,27 +37,152 @@ exports.postCtrl = {
             res.status(500).json({ err: err });
         }
     },
-    update : async(req,res) =>{
+    update: async (req, res) => {
         try {
             let postID = req.params.postID;
             let data;
             if (req.tokenData.role === "admin") {
-                data = await PostModel.updateOne({ _id: postID },req.body);
+                data = await PostModel.updateOne({ _id: postID }, req.body);
             }
             else {
-                data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id },req.body);
+                data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id }, req.body);
             }
-            let post = await PostModel.findOne({_id:postID})
-            post.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
-            post.save()
-            res.status(200).json({data,msg:"post edited"});
+            if (data.modifiedCount === 1) {
+                let post = await PostModel.findOne({ _id: postID })
+                post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+                post.save()
+                return res.status(200).json({ data, msg: "post edited" });
+            }
+            res.status(400).json({ data: null, msg: "cannot edit post" });
         }
         catch (err) {
             console.log(err)
             res.status(400).json({ err })
         }
     },
-    delete : async(req,res) =>{
-        
+    delete: async (req, res) => {
+        try {
+            let postID = req.params.postID;
+            let data;
+            if (req.tokenData.role === "admin") {
+                data = await PostModel.deleteOne({ _id: postID }, req.body);
+            }
+            else {
+                data = await PostModel.deleteOne({ _id: postID, creator_id: req.tokenData._id }, req.body);
+            }
+            if (data.deletedCount === 1) {
+                return res.status(200).json({ data, msg: "post deleted" });
+            }
+            res.status(400).json({ data: null, msg: "user cannot delete this post" });
+        }
+        catch (err) {
+            console.log(err)
+            res.status(400).json({ err })
+        }
+    },
+    countAll: async (req, res) => {
+        try {
+            let count = await PostModel.countDocuments({});
+            res.json({ count });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    countMyPosts: async (req, res) => {
+        try {
+            let count = await PostModel.countDocuments({ creator_id: req.tokenData._id });
+            res.json({ count });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    search: async (req, res) => {
+        let perPage = Math.min(req.query.perPage, 20) || 10;
+        let page = req.query.page || 1;
+        try {
+            let searchQ = req.query.s;
+            let searchReg = new RegExp(searchQ, "i");
+            let books = await BookModel.find({ $or: [{ title: searchReg }, { info: searchReg }] })
+                .limit(perPage)
+                .skip((page - 1) * perPage)
+            res.json(books);
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).json({ err: err });
+        }
+    },
+    changeActive: async (req, res) => {
+        if (!req.body.active && req.body.active != false) {
+            return res.status(400).json({ msg: "Need to send active in body" });
+        }
+        try {
+            let postID = req.params.postID;
+            if (postID == config.superID) {
+                return res.status(401).json({ msg: "You cant change superadmin to user" });
+            }
+            let data = await PostModel.updateOne({ _id: postID },{ active: req.body.active });
+    
+            //update the change time 
+            let post = await PostModel.findOne({ _id: postID })
+            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.save()
+
+            return res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
+    singleInfo : async(req,res) =>{
+        let perPage = Math.min(req.query.perPage, 20) || 10;
+        let page = req.query.page || 1;
+        let sort = req.query.sort || "_id";
+        let reverse = req.query.reverse == "yes" ? -1 : 1
+        try {
+            let posts = await PostModel
+                .find({creator_id : req.tokenData._id})
+                .limit(perPage)
+                .skip((page - 1) * perPage)
+                .sort({ [sort]: reverse })
+            res.json(posts);
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).json({ err: err });
+        }
+    },
+    changeRange: async (req, res) => {
+        if (!req.body.range && req.body.range != false) {
+            return res.status(400).json({ msg: "Need to send range in body" });
+        }
+        if(req.body.range != "long-term" && req.body.range != "short-term"){
+            console.log(typeof req.body.range)
+            return res.status(400).json({ msg: "Range must be long/short-term" });
+        }
+        try {
+            let postID = req.params.postID;
+            let data;
+            if (postID == config.superID) {
+                return res.status(401).json({ msg: "You cant change superadmin to user" });
+            }
+            if(req.tokenData.role === "admin"){
+                data = await PostModel.updateOne({ _id: postID },{ range: req.body.range });
+            }
+            else{
+                data = await PostModel.updateOne({ _id: postID, creator_id : req.tokenData._id },{ range: req.body.range });
+            }
+            //update the change time 
+            let post = await PostModel.findOne({ _id: postID })
+            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.save()
+            return res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
     }
+
 }
