@@ -17,9 +17,11 @@ router.get("/userList", authAdmin , userCtrl.getUsersList)
 
 router.get("/countUsers",authAdmin , userCtrl.countUsers)
 
+router.get("/countCategories",authAdmin , userCtrl.countCategories)
+
 router.get('/info/:id', auth , userCtrl.infoById)
 
-router.post("/:idEdit", auth , userCtrl.edit)
+router.put("/:idEdit", auth , userCtrl.edit)
 
 router.delete("/:idDel", auth , userCtrl.delete)
 
