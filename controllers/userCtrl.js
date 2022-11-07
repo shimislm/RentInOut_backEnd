@@ -152,8 +152,8 @@ exports.userCtrl = {
     try {
       let idEdit = req.params.idEdit;
       let user;
-      if(req.body.email){
-        return res.status(401).json({msg: "email change is not allowed"})
+      if(req.body.email || req.body.password){
+        return res.status(401).json({msg: "email/pasword change is not allowed"})
       }
       if (req.tokenData.role === "admin") {
           user = await UserModel.updateOne({ _id: idEdit },req.body );
