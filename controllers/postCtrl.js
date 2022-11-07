@@ -2,6 +2,7 @@ const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel")
 const { validatePost } = require("../validations/postValid");
+const _ = require("lodash")
 const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
@@ -192,18 +193,31 @@ exports.postCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+    // :(
     likePost: async (req, res) => {
         try {
             let { fullName } = await UserModel.findOne({ _id: req.tokenData._id });
+            //creating an object from the user 
             let user = {
-                user_id : req.tokenData._id,
+                user_id: req.tokenData._id,
                 profile: "https://cdn-icons-png.flaticon.com/128/1077/1077114.png",
                 fullName
             }
             let postID = req.params.postID;
             let post = await PostModel.findOne({ _id: postID });
-            await post.likes.push(user);
-            res.status(201).json({ user,msg: "You like the post" })
+            //need to check if the user already 
+            // if the user found in the array setup found true else false
+            const found = post.likes.some(el => el.user_id === req.tokenData._id);
+            if (!found) {
+                post.likes.push(user);
+                await post.save()
+                return res.status(201).json({ posts: post.likes, msg: "You like the post" })
+            }
+            // remove from post like the user. may take long time check with Yarin
+            _.remove(post.likes, (user) => user.user_id === req.tokenData._id)
+            // save it on mongoDB *doesn't work :((((*
+            await post.save()
+            res.status(201).json({ posts: post.likes, msg: "unlike the post" })
         } catch (err) {
             console.log(err);
             res.status(500).json({ msg: "err", err });
@@ -220,4 +234,14 @@ exports.postCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+    topThreeLikes: async (req, res) => {
+        try {
+            let postID = req.params.postID;
+            let post = await PostModel.findOne({ _id: postID })
+            res.json({ likes: post.likes.splice(0, 3) })
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    }
 }

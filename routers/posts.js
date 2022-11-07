@@ -14,9 +14,9 @@ router.get("/single/:postID", auth ,postCtrl.singleInfo);
 router.patch("/changeRange/:postID", auth, postCtrl.changeRange);
 router.get("/search", postCtrl.search);
 router.get("/checkLikes/:postID",postCtrl.countLikes);
-// not done/ not working yet
+router.get("/topThreeLikes/:postID",postCtrl.topThreeLikes);
+// not working after remove the user likes doesn't save on db
 router.post("/likePost/:postID",auth,  postCtrl.likePost)
-router.get("/topThreeLikes/:postID");
 
 module.exports = router;
 
