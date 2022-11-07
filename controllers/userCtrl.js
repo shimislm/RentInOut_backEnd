@@ -50,9 +50,6 @@ exports.userCtrl = {
       return res.status(500).json({ msg: "err", err });
     }
   },
-
- 
-
   countUsers: async (req, res) => {
     try {
       let count = await UserModel.countDocuments({});
@@ -89,6 +86,9 @@ exports.userCtrl = {
         { _id: userID },
         { role: req.body.role }
       );
+      let user = await UserModel.findOne({_id:userID})
+      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      user.save()
       return res.json(data);
     } catch (err) {
       console.log(err);
@@ -112,7 +112,10 @@ exports.userCtrl = {
         { _id: userID },
         { active: req.body.active }
       );
-      res.json(data);
+      let user = await UserModel.findOne({_id:userID})
+      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      user.save()
+      return res.json(data);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -152,15 +155,15 @@ exports.userCtrl = {
       if(req.body.email){
         return res.status(401).json({msg: "email change is not allowed"})
       }
-      
       if (req.tokenData.role === "admin") {
-          user = await UserModel.updateOne({ _id: idEdit },req.body);
+          user = await UserModel.updateOne({ _id: idEdit },req.body );
       }
       else {
         user = await UserModel.updateOne({ _id: idEdit,_id: req.tokenData._id },req.body);
-        console.log(user)
       }
-      // user.password = await bcrypt.hash(user.password, 10);
+      user = await UserModel.findOne({_id:idEdit})
+      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      user.save()
       return res.status(200).json({ msg: user })
   }
   catch (err) {
