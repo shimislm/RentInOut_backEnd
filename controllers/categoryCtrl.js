@@ -30,11 +30,13 @@ exports.categoryCtrl = {
         try{
           let category = new CategoryModel(req.body);
           await category.save();
-          res.json(category);
+
+          return res.json(category);
+
         }
         catch(err){
           console.log(err)
-          res.status(500).json({msg:"err",err})
+          return res.status(500).json({msg:"err",err})
         }
       },
       
@@ -45,8 +47,12 @@ exports.categoryCtrl = {
           res.status(400).json(validBody.error.details)
         }
         try{
+          
           let idEdit = req.params.idEdit
           let data = await CategoryModel.updateOne({_id:idEdit},req.body);
+          let category = await CategoryModel.findOne({_id:idEdit})
+          category.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+          category.save()
           res.json(data);
         }
         catch(err){
