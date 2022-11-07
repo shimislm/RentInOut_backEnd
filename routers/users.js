@@ -4,21 +4,20 @@ const router = express.Router();
 const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
 
-router.get("/" , (req,res)=> {
-    res.json({msg:"Users work!!!!!"})
-  })
 // authonication routes
-router.post('/login', authCtrl.login)
-
 router.post('/', authCtrl.signUp)
+
+router.post('/login', authCtrl.login)
 
 // user routes
 
-router.get("/userList",authAdmin , userCtrl.getList)
+router.get("/userList", authAdmin , userCtrl.getUsersList)
 
-router.get("/count",authAdmin , userCtrl.countUsers)
+// router.get("/categoryList",authAdmin , userCtrl.getCategoriesList)
 
-router.get('/info', auth , userCtrl.info)
+router.get("/countUsers",authAdmin , userCtrl.countUsers)
+
+router.get('/info/:id', auth , userCtrl.infoById)
 
 router.post("/:idEdit", auth , userCtrl.edit)
 
