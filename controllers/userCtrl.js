@@ -59,15 +59,6 @@ exports.userCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  countCategories: async (req, res) => {
-    try {
-      let count = await CategoryModel.countDocuments({});
-      res.json({ count });
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
-    }
-  },
 
   changeRole: async (req, res) => {
     if (!req.body.role) {
