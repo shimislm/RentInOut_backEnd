@@ -32,6 +32,8 @@ exports.userCtrl = {
     }
   },
 
+ 
+
   countUsers: async (req, res) => {
     try {
       let count = await UserModel.countDocuments({});

@@ -1,0 +1,93 @@
+const express= require("express");
+const {  CategoryModel } = require("../models/categoryModel");
+const {validateCategory} =require("../validations/categoryValid")
+const router = express.Router();
+
+exports.categoryCtrl = {
+    getlist: async(req,res)=> {
+        let perPage = req.query.perPage || 50;
+        let page = req.query.page || 1;
+      
+        try{
+          let data = await CategoryModel.find({})
+          .limit(perPage)
+          .skip((page - 1) * perPage)
+          .sort({_id:-1})
+          res.json(data);
+        }
+        catch(err){
+          console.log(err);
+          res.status(500).json({msg:"there error try again later",err})
+        }
+      },
+      
+      
+       addcat : async(req,res) => {
+        let validBody = validateCategory(req.body);
+        if(validBody.error){
+          res.status(400).json(validBody.error.details)
+        }
+        try{
+          let category = new CategoryModel(req.body);
+          await category.save();
+          res.json(category);
+        }
+        catch(err){
+          console.log(err)
+          res.status(500).json({msg:"err",err})
+        }
+      },
+      
+      
+     editcat: async(req,res) => {
+        let validBody = validateCategory(req.body);
+        if(validBody.error){
+          res.status(400).json(validBody.error.details)
+        }
+        try{
+          let idEdit = req.params.idEdit
+          let data = await CategoryModel.updateOne({_id:idEdit},req.body);
+          res.json(data);
+        }
+        catch(err){
+          console.log(err)
+          res.status(500).json({msg:"err",err})
+        }
+      },
+      
+      delete: async(req,res) => {
+        try{
+          let idDel = req.params.idDel
+          let data = await CategoryModel.deleteOne({_id:idDel});
+          res.json(data);
+        }
+        catch(err){
+          console.log(err)
+          res.status(500).json({msg:"err",err})
+        }
+      },
+      countCat: async (req, res) => {
+        try {
+          let count = await CategoryModel.countDocuments({});
+          res.json({ count });
+        } catch (err) {
+          console.log(err);
+          res.status(500).json({ msg: "err", err });
+        }
+      }
+      
+      
+    //   router.get("/byId/:id", async(req,res) => {
+    //     try{
+    //       let data = await CategoryModel.findOne({_id:req.params.id})
+    //       res.json(data);
+    //     }
+    //     catch(err){
+    //       console.log(err);
+    //       res.status(500).json({msg:"there error try again later",err})
+    //     }
+    //   })
+}
+
+
+
