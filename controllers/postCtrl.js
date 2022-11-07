@@ -1,7 +1,8 @@
 const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
 const { validatePost } = require("../validations/postValid");
-
+const MAX = 10000000;
+const MIN = 0;
 exports.postCtrl = {
     getAll: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
@@ -102,48 +103,52 @@ exports.postCtrl = {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         try {
-            let searchQ = req.query.s;
+            let searchQ = req.query?.s;
+            let max = req.query.max || MAX;
+            let min = req.query.min || MIN;
             let searchReg = new RegExp(searchQ, "i");
-            let books = await BookModel.find({ $or: [{ title: searchReg }, { info: searchReg }] })
+            // http://localhost:3000/posts/search?s=board&min=10&max=21
+            let books = await PostModel.find({$and : [{ $or: [{ title: searchReg }, { info: searchReg }]},
+                {$and:[{price:{$gte:min}},{price:{$lte:max}}]}]})
                 .limit(perPage)
-                .skip((page - 1) * perPage)
+        .skip((page - 1) * perPage)
             res.json(books);
-        }
+}
         catch (err) {
-            console.log(err);
-            res.status(500).json({ err: err });
-        }
+    console.log(err);
+    res.status(500).json({ err: err });
+}
     },
-    changeActive: async (req, res) => {
-        if (!req.body.active && req.body.active != false) {
-            return res.status(400).json({ msg: "Need to send active in body" });
+changeActive: async (req, res) => {
+    if (!req.body.active && req.body.active != false) {
+        return res.status(400).json({ msg: "Need to send active in body" });
+    }
+    try {
+        let postID = req.params.postID;
+        if (postID == config.superID) {
+            return res.status(401).json({ msg: "You cant change superadmin to user" });
         }
-        try {
-            let postID = req.params.postID;
-            if (postID == config.superID) {
-                return res.status(401).json({ msg: "You cant change superadmin to user" });
-            }
-            let data = await PostModel.updateOne({ _id: postID },{ active: req.body.active });
-    
-            //update the change time 
-            let post = await PostModel.findOne({ _id: postID })
-            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
-            post.save()
+        let data = await PostModel.updateOne({ _id: postID }, { active: req.body.active });
 
-            return res.json(data);
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({ msg: "err", err });
-        }
-    },
-    singleInfo : async(req,res) =>{
+        //update the change time 
+        let post = await PostModel.findOne({ _id: postID })
+        post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+        post.save()
+
+        return res.json(data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "err", err });
+    }
+},
+    singleInfo : async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         let sort = req.query.sort || "_id";
         let reverse = req.query.reverse == "yes" ? -1 : 1
         try {
             let posts = await PostModel
-                .find({creator_id : req.tokenData._id})
+                .find({ creator_id: req.tokenData._id })
                 .limit(perPage)
                 .skip((page - 1) * perPage)
                 .sort({ [sort]: reverse })
@@ -154,35 +159,35 @@ exports.postCtrl = {
             res.status(500).json({ err: err });
         }
     },
-    changeRange: async (req, res) => {
-        if (!req.body.range && req.body.range != false) {
-            return res.status(400).json({ msg: "Need to send range in body" });
-        }
-        if(req.body.range != "long-term" && req.body.range != "short-term"){
-            console.log(typeof req.body.range)
-            return res.status(400).json({ msg: "Range must be long/short-term" });
-        }
-        try {
-            let postID = req.params.postID;
-            let data;
-            if (postID == config.superID) {
-                return res.status(401).json({ msg: "You cant change superadmin to user" });
+        changeRange: async (req, res) => {
+            if (!req.body.range && req.body.range != false) {
+                return res.status(400).json({ msg: "Need to send range in body" });
             }
-            if(req.tokenData.role === "admin"){
-                data = await PostModel.updateOne({ _id: postID },{ range: req.body.range });
+            if (req.body.range != "long-term" && req.body.range != "short-term") {
+                console.log(typeof req.body.range)
+                return res.status(400).json({ msg: "Range must be long/short-term" });
             }
-            else{
-                data = await PostModel.updateOne({ _id: postID, creator_id : req.tokenData._id },{ range: req.body.range });
+            try {
+                let postID = req.params.postID;
+                let data;
+                if (postID == config.superID) {
+                    return res.status(401).json({ msg: "You cant change superadmin to user" });
+                }
+                if (req.tokenData.role === "admin") {
+                    data = await PostModel.updateOne({ _id: postID }, { range: req.body.range });
+                }
+                else {
+                    data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id }, { range: req.body.range });
+                }
+                //update the change time 
+                let post = await PostModel.findOne({ _id: postID })
+                post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+                post.save()
+                return res.json(data);
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({ msg: "err", err });
             }
-            //update the change time 
-            let post = await PostModel.findOne({ _id: postID })
-            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
-            post.save()
-            return res.json(data);
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({ msg: "err", err });
         }
-    }
 
 }
