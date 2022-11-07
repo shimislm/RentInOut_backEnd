@@ -6,8 +6,8 @@ const router = express.Router();
 router.get("/", postCtrl.getAll);
 router.post("/", auth , postCtrl.upload);
 router.put("/:postID", auth ,postCtrl.update);
+router.delete("/:postID", auth ,postCtrl.delete);
 
-router.delete("/:postID", auth);
 router.get("/count", authAdmin);
 router.get("/countMyPosts", auth);
 router.get("/search",);

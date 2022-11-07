@@ -46,11 +46,17 @@ exports.postCtrl = {
             else {
                 data = await PostModel.updateOne({ _id: postID, creator_id: req.tokenData._id },req.body);
             }
+            let post = await PostModel.findOne({_id:postID})
+            post.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+            post.save()
             res.status(200).json({data,msg:"post edited"});
         }
         catch (err) {
             console.log(err)
             res.status(400).json({ err })
         }
+    },
+    delete : async(req,res) =>{
+        
     }
 }

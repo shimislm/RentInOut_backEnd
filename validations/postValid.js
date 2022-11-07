@@ -10,6 +10,7 @@ exports.validatePost = (_reqBody) => {
     type : Joi.string().valid('rent','exchange','delivery').allow(null,""),
     available_from : Joi.date().min(2).max(50).allow(null,""),
     location : Joi.string().min(2).max(50).required(),
+    category_url : Joi.string().min(2).max(50).required()
   });
   return joiSchema.validate(_reqBody);
 };

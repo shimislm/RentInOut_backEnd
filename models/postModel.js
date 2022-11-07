@@ -41,6 +41,7 @@ const postSchema = new mongoose.Schema({
         default: new Date(Date.now() +2 * 60 * 60 * 1000)
     },
     location: String,
+    category_url: String,
     likes:{
         type: Array(likesObject),
         default: []
