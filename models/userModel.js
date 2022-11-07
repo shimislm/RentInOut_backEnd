@@ -13,10 +13,11 @@ const userSchema = new mongoose.Schema({
   profile_img: String,
   cover_img: String,
   location: String,
-  birtdate: Date,
+  birthdate: Date,
   role:{
       type: String,
       default: "user",
+      enum : ["user", "admin"]
   },
   active:{
     type: Boolean,
@@ -26,7 +27,10 @@ const userSchema = new mongoose.Schema({
     type:Number,
     default: 10
   },
-  bio: String,
+  bio:{
+    type:String,
+    default: ""
+  },
   productsList: {
     type: [String],
     default: []

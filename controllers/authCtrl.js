@@ -38,9 +38,9 @@ exports.authCtrl = {
             if (!validPass) {
                 return res.status(401).json({ msg_err: "Invalid password" })
             }
-
+            const {active} = user
             let newToken = createToken(user._id ,user.role)
-            return res.json({token:newToken});
+            return res.json({token:newToken, active });
         } catch (err) {
             return res.status(500).json({ msg_err: "There was an error signing" });
         }

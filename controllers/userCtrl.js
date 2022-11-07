@@ -1,4 +1,4 @@
-const express = require("express");
+
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
@@ -10,33 +10,59 @@ exports.userCtrl = {
   },
   infoById: async (req, res) => {
     try {
-      if(req.tokenData.role === "admin"){
-
+      let id = req.params.id;
+      let userInfo;
+      if (id == config.superID) {
+        return res
+          .status(401)
+          .json({ msg: "You cant change superadmin to user" });
       }
-      let userInfo = await UserModel.findOne(
-        { _id: req.tokenData._id },
-        { password: 0 }
-      );
-      res.json(userInfo);
+      if (req.tokenData.role == "admin") {
+          userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      }
+      else if (req.tokenData._id === id) {
+        userInfo = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 });
+      }
+      else {
+        return res
+         .status(401).json({ msg: "Not allowed"})
+      }
+      return res.json({userInfo});
     } catch (err) {
       console.log(err);
-      res.status(500).json({ msg: "err", err });
+      return res.status(500).json({ msg: "err", err });
     }
-  },
-
+    },
   getUsersList: async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "_id";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await UserModel.find({}, { password: 0 }).limit(20);
-      res.json(data);
+      let data = await UserModel
+        .find({}, { password: 0 })
+        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .sort({ [sort]: reverse });
+      return res.json(data);
     } catch (err) {
       console.log(err);
-      res.status(500).json({ msg: "err", err });
+      return res.status(500).json({ msg: "err", err });
     }
   },
 
   countUsers: async (req, res) => {
     try {
       let count = await UserModel.countDocuments({});
+      res.json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+  countCategories: async (req, res) => {
+    try {
+      let count = await CategoryModel.countDocuments({});
       res.json({ count });
     } catch (err) {
       console.log(err);
@@ -61,10 +87,10 @@ exports.userCtrl = {
         { _id: userID },
         { role: req.body.role }
       );
-      res.json(data);
+      return res.json(data);
     } catch (err) {
       console.log(err);
-      res.status(500).json({ msg: "err", err });
+      return res.status(500).json({ msg: "err", err });
     }
   },
 
@@ -92,30 +118,25 @@ exports.userCtrl = {
   },
 
   delete: async (req, res) => {
-    let userValid = validateUser(req.body);
-    if (!userValid) {
-      return res.status(400).json({ msg: "Need to send valid body" });
-    }
     try {
-      let userID = req.params.idDel;
-      const user = await UserModel.findOne({ _id: userID });
-      let data;
+      let idDel = req.params.idDel;
+      let userInfo;
 
-      if (userID == config.superID) {
-        return res.status(401).json({ msg: "You cant delete superadmin" });
+      if (req.tokenData.role == "admin") {
+          userInfo = await UserModel.deleteOne({ _id: idDel }, { password: 0 });
       }
-      if (user.role === "admin") {
-        data = await UserModel.deleteOne({ _id: userID });
-      } else {
-        data = await UserModel.deleteOne({
-          _id: userID,
-          userID: req.tokenData._id,
-        });
+      else if (req.tokenData._id === idDel) {
+        userInfo = await UserModel.deleteOne({ _id: req.tokenData._id }, { password: 0 });
       }
-      res.json(data);
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
+      else {
+        return res
+         .status(401).json({ msg: "Not allowed"})
+      }
+      res.json(userInfo);
+    }
+    catch (err) {
+      console.log(err)
+      res.status(500).json({ msg: "err", err })
     }
   },
   edit: async (req, res) => {
@@ -124,25 +145,25 @@ exports.userCtrl = {
       return res.status(400).json({ msg: "Need to send valid body" });
     }
     try {
-      const user = await UserModel.findOne({ _id: userID });
-      let userID = req.params.idEdit;
-      if (userID == config.superID) {
-        return res.status(401).json({ msg: "You cant update Superadmin" });
+      let idEdit = req.params.idEdit;
+      let user;
+      if(req.body.email){
+        return res.status(401).json({msg: "email change is not allowed"})
       }
-      if (user.role === "admin") {
-        data = await UserModel.updateOne({ _id: userID });
+      
+      if (req.tokenData.role === "admin") {
+          user = await UserModel.updateOne({ _id: idEdit },req.body);
       }
       else {
-        data = await UserModel.updateOne({
-          _id: userID,
-          userID: req.tokenData._id,
-        }, req.body);
-
-      res.json(data);
+        user = await UserModel.updateOne({ _id: idEdit,_id: req.tokenData._id },req.body);
+        console.log(user)
       }
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
-    }
+      // user.password = await bcrypt.hash(user.password, 10);
+      return res.status(200).json({ msg: user })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ msg: "err", err });
+  }
   },
 };
