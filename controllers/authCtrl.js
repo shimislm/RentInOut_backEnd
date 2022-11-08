@@ -96,6 +96,9 @@ exports.authCtrl = {
         return res.status(401).json({ msg_err: "Invalid password" });
       }
       const { active } = user;
+      if(!active){
+        return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
+      }
       let newToken = createToken(user._id, user.role);
       return res.json({ token: newToken, active });
     } catch (err) {
