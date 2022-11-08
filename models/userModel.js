@@ -9,7 +9,10 @@ const userSchema = new mongoose.Schema({
   password: String,
   password_changed: Date,
   phone: String,
-  profile_img: String,
+  profile_img:{
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/128/1077/1077114.png",
+  },
   cover_img: String,
   location: String,
   birthdate: Date,
@@ -20,7 +23,7 @@ const userSchema = new mongoose.Schema({
   },
   active: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   rank: {
     type: Number,

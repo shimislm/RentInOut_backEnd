@@ -4,6 +4,7 @@ const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
 
+
 exports.userCtrl = {
   checkToken: async (req, res) => {
     res.json(req.tokenData);
