@@ -145,7 +145,7 @@ exports.postCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
-    singleInfo: async (req, res) => {
+    userPosts: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         let sort = req.query.sort || "_id";
