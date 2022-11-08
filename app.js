@@ -4,6 +4,7 @@ const http = require("http");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const { routesInit} = require("./routers/config_routes")
+require("dotenv").config()
 require("./db/mongoconnect");
 
 const app = express();
