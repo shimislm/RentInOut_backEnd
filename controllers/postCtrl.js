@@ -53,7 +53,7 @@ exports.postCtrl = {
             if (data.modifiedCount === 1) {
                 let post = await PostModel.findOne({ _id: postID })
                 post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
-                post.save()
+                await post.save()
                 return res.status(200).json({ data, msg: "post edited" });
             }
             res.status(400).json({ data: null, msg: "cannot edit post" });
@@ -145,7 +145,7 @@ exports.postCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
-    singleInfo: async (req, res) => {
+    userPosts: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
         let sort = req.query.sort || "_id";
@@ -193,7 +193,6 @@ exports.postCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
-    // :(
     likePost: async (req, res) => {
         try {
             let { fullName } = await UserModel.findOne({ _id: req.tokenData._id });
@@ -213,9 +212,8 @@ exports.postCtrl = {
                 await post.save()
                 return res.status(201).json({ posts: post.likes, msg: "You like the post" })
             }
-            // remove from post like the user. may take long time check with Yarin
-            _.remove(post.likes, (user) => user.user_id === req.tokenData._id)
-            // save it on mongoDB *doesn't work :((((*
+            // remove from post like the user.
+            post.likes = post.likes.filter((e) => e.user_id != req.tokenData._id)
             await post.save()
             res.status(201).json({ posts: post.likes, msg: "unlike the post" })
         } catch (err) {
