@@ -1,8 +1,10 @@
-
 const jwt = require("jsonwebtoken");
 const { config } = require("../config/config");
 
-
+exports.isLoggedIn = (req,res,next) =>
+{
+  req.user ? next() : res.sendStatus(401);
+}
 exports.auth = async(req,res, next) =>{
     let token = req.header("x-api-key")
     if(!token) {
