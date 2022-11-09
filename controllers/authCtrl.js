@@ -112,9 +112,9 @@ exports.authCtrl = {
           const { expiresAt } = result[0];
           const hashedUniqueString = result[0].uniqueString;
           if (expiresAt < (Date.now()+ 2* 60* 60*1000)) {
-            UserVerificationModel.deleteone({ userId })
+            UserVerificationModel.deleteOne({ userId })
             .then(() => {
-                UserModel.deleteone({ _id: userId }).then(() => {
+                UserModel.deleteOne({ _id: userId }).then(() => {
                     let message = "link hsa expired.please sigh up again ";
                     res.redirect(`/users/verified/error=true&message=${message}`);
                   })
