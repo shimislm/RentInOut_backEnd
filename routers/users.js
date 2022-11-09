@@ -7,6 +7,7 @@ const { authCtrl } = require("../controllers/authCtrl");
 // authonication routes
 router.post('/', authCtrl.signUp)
 
+
 router.get("/verified" , authCtrl.verifiedUser)
 
 router.get("/verify/:userId/:uniqueString" , authCtrl.verifyUser)
