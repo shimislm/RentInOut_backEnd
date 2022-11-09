@@ -14,6 +14,8 @@ router.get("/verify/:userId/:uniqueString" , authCtrl.verifyUser)
 
 router.post('/login', authCtrl.login)
 
+router.post("/requestPasswordReset", authCtrl.requestPasswordReset)
+
 // user routes
 
 router.get("/userList", authAdmin , userCtrl.getUsersList)

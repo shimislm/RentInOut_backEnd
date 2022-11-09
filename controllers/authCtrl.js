@@ -1,62 +1,12 @@
 const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
-const { createToken ,mailOptions } = require("../helpers/userHelper");
+const { createToken , sendResetEmail , sendVerificationEmail } = require("../helpers/userHelper");
 const { UserVerificationModel } = require("../models/UserVerificationModel");
-const nodemailer = require("nodemailer");
-const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 require("dotenv").config();
 
 const salRounds = 10;
-// import email props
-let transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // use SSL
-  auth: {
-    user: process.env.AUTH_EMAIL,
-    pass: process.env.AUTH_PASS
-  }
-});
-
-
-const sendVerificationEmail = async({ _id, email }, res) => {
-    // console.log("email " + email)
-    // console.log("id " + _id)
-    // creat an unique string
-    const uniqueString = uuidv4() + _id;
-    // create email options for spcific collection 
-    let mail = mailOptions(_id,uniqueString,email);
-    await bcrypt.hash(uniqueString, salRounds)
-    // hashed the unique string
-      .then((hasheduniqueString) => {
-        // create ne collection in verify user model
-        const userVerification = new UserVerificationModel({
-          userId: _id,
-          uniqueString: hasheduniqueString,
-        });
-        userVerification.save()
-          .then(() => {
-            // send the email notification
-            transporter.sendMail(mail, (err, info) => {
-              if (err) {
-                console.log(err);
-              }
-              console.log('Message sent: %s', info.response );
-  
-            })
-          })
-          .catch((error) => {
-            console.log(error)
-            res.json({
-              status: "failed",
-              message: "an error  cant save",
-            });
-          })
-  
-      })
-  };
 
 exports.authCtrl = {
   
@@ -183,5 +133,36 @@ exports.authCtrl = {
   },
   verifiedUser: async (req, res) => {
     res.sendFile(path.join(__dirname, "../views/verified.html"))
+  },
+  requestPasswordReset: async (req,res) =>{
+    const { email , redirectUrl } = req.body;
+
+    UserModel.findOne({ email })
+      .then((data) => {
+        if(data){
+          // check if user is active
+          if(!data.active){
+            res.json({
+              status: "failed",
+              message: "Email isn't verified yet or account as been suspended, please check your email"
+            })
+          }else{
+            // procced to email reset pasword
+            sendResetEmail(data , redirectUrl , res)
+          }
+        }else{
+          res.json({
+            status: "failed",
+            message: "No account with the supplied email found. Please try again"
+          })
+        }
+      })
+      .catch(error=>{
+        console.log(error)
+        res.json({
+          status: "failed",
+          message: "an error occured while checking user existing",
+        });
+    })
   }
 };
