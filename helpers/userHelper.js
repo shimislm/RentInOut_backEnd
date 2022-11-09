@@ -80,7 +80,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
     const html = `<p>We heard that you forgot your password.</p>
     <p>Don't worry, use the link below to reset it.</p>
     <p>This link <b>expires in 60min </b></p>
-    <p>Press <a href=${DOMAIN +"/"+_id+"/"+ resetString}>here</a></p>`;
+    <p>Press <a href=${redirectUrl +"/"+_id+"/"+ resetString}>here</a></p>`;
     // clear all existing request for the same user
     let mail = mailOptions(_id, resetString , email , "Password reset" , html)
     PasswordReset.deleteMany({userId : _id})
