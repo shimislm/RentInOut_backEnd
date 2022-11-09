@@ -8,6 +8,7 @@ const { authCtrl } = require("../controllers/authCtrl");
 router.post('/', authCtrl.signUp)
 
 router.get("/verified/:userId/:uniqueString" , authCtrl.verifyUser)
+router.get("/verified/notseccess" , authCtrl.verifyUser)
 
 router.post('/login', authCtrl.login)
 
