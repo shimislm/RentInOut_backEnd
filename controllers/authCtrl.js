@@ -9,9 +9,8 @@ const path = require("path");
 require("dotenv").config();
 
 const salRounds = 10;
-
+// import email props
 let transporter = nodemailer.createTransport({
-
   host: 'smtp.gmail.com',
   port: 465,
   secure: true, // use SSL
@@ -23,22 +22,23 @@ let transporter = nodemailer.createTransport({
 
 
 const sendVerificationEmail = async({ _id, email }, res) => {
-    console.log("email " + email)
-    console.log("id " + _id)
+    // console.log("email " + email)
+    // console.log("id " + _id)
+    // creat an unique string
     const uniqueString = uuidv4() + _id;
-    let mail=mailOptions(_id,uniqueString,email);
-    console.log("hash: " ,uniqueString)
-    await bcrypt
-      .hash(uniqueString, salRounds)
+    // create email options for spcific collection 
+    let mail = mailOptions(_id,uniqueString,email);
+    await bcrypt.hash(uniqueString, salRounds)
+    // hashed the unique string
       .then((hasheduniqueString) => {
-  
+        // create ne collection in verify user model
         const userVerification = new UserVerificationModel({
           userId: _id,
           uniqueString: hasheduniqueString,
         });
-        userVerification
-          .save()
+        userVerification.save()
           .then(() => {
+            // send the email notification
             transporter.sendMail(mail, (err, info) => {
               if (err) {
                 console.log(err);
@@ -70,6 +70,7 @@ exports.authCtrl = {
           user.password = await bcrypt.hash(user.password, salRounds);
           await user.save();
           user.password = "********";
+          // send verification email
           sendVerificationEmail(user, res);
           res.status(201).json(user);
         }
@@ -108,14 +109,16 @@ exports.authCtrl = {
   verifyUser: async (req, res) => {
     let { userId, uniqueString } = req.params;
     UserVerificationModel.find({ userId }).then((result) => {
+      //check if user exist in system
         if (result.length > 0) {
           const { expiresAt } = result[0];
           const hashedUniqueString = result[0].uniqueString;
           if (expiresAt < (Date.now()+ 2* 60* 60*1000)) {
+            //checkes if link expired and sent a messege, delete verify collection in db
             UserVerificationModel.deleteOne({ userId })
             .then(() => {
                 UserModel.deleteOne({ _id: userId }).then(() => {
-                    let message = "link hsa expired.please sigh up again ";
+                    let message = "link has expired.please sigh up again ";
                     res.redirect(`/users/verified/error=true&message=${message}`);
                   })
                   .catch(() => {
@@ -130,14 +133,15 @@ exports.authCtrl = {
               })
           }
           else {
-            bcrypt
-              .compare(uniqueString, hashedUniqueString)
+            bcrypt.compare(uniqueString, hashedUniqueString)
               .then(result => {
                 if (result) {
+                  // update user to active state
                   UserModel
                     .updateOne({ _id: userId }, { active: true })
                     .then(() => {
-                      UserVerificationModel.deleteOne({ _id :userId })
+                      // delet verify user collection when verified
+                      UserVerificationModel.deleteOne({ userId })
                         .then(() => {
                           res.sendFile(path.join(__dirname, "./../views/verified.html"));
                         })
@@ -167,7 +171,7 @@ exports.authCtrl = {
           }
 
         } else {
-          let message = "Account   doesnt exist or has been verified already.please sign up or login in.";
+          let message = "Account doesnt exist or has been verified already.please sign up or login in.";
           res.redirect(`/users/verified/error=true&message=${message}`);
         }
       })
