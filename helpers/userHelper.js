@@ -75,8 +75,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
   };
 // redirect url is an frontend url were we reset password
   exports.sendResetEmail = async({_id , email} , redirectUrl , res )=>{
-    const resetString = uuidv4 + _id;
-    console.log(email . _id)
+    const resetString = uuidv4() + _id;
     const html = `<p>We heard that you forgot your password.</p>
     <p>Don't worry, use the link below to reset it.</p>
     <p>This link <b>expires in 60min </b></p>

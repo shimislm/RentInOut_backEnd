@@ -136,7 +136,7 @@ exports.authCtrl = {
   },
   requestPasswordReset: async (req,res) =>{
     const { email , redirectUrl } = req.body;
-
+    
     UserModel.findOne({ email })
       .then((data) => {
         if(data){
