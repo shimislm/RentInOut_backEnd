@@ -3,7 +3,7 @@ const { UserVerificationModel } = require("../models/UserVerificationModel");
 const { PasswordReset} = require("../models/passwordReset")
 const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");
-const { DOMAIN, config } = require("../config/config");
+const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
@@ -39,7 +39,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
     // console.log("email " + email)
     // console.log("id " + _id)
     const uniqueString = uuidv4() + _id;
-    const html =`<p>Verify Your Email </p><p> click <a href=${DOMAIN+"/users/verify/"+_id+"/"+uniqueString}> here</a></p>`
+    const html =`<p>Verify Your Email </p><p> click <a href=${config.domain+"/users/verify/"+_id+"/"+uniqueString}> here</a></p>`
     
     // creat an unique string
     // create email options for spcific collection 
