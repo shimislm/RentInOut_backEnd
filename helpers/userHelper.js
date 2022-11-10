@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
-const { UserModel } = require("../models/userModel");
 const { UserVerificationModel } = require("../models/UserVerificationModel");
 const { PasswordReset} = require("../models/passwordReset")
 const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");
-const path = require("path");
-const { DOMAIN } = require("../config/config");
+const { DOMAIN, config } = require("../config/config");
+const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
 
 exports.createToken = (_id, role) =>{
