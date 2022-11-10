@@ -14,8 +14,7 @@
             var userData = JSON.parse(result);
             $("body").prepend(`
                 <img src="${userData.profile}">
-                <h1>Welcome ${userData.email}</h1>
-                <p>Gender ${JSON.stringify(userData,null,2)}</p>
+                <h1>Welcome ${userData.user.given_name} ${userData.user.family_name}</h1>
                 <a href="/users/logout">log out</a>
             `)
             console.log(userData)

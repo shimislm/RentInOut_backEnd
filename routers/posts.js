@@ -2,12 +2,12 @@ const express = require("express");
 const { auth, authAdmin } = require("../middlewares/auth");
 const { postCtrl } = require("../controllers/postCtrl");
 const router = express.Router();
-// MVC
+// CRUD
 router.get("/", postCtrl.getAll);
 router.post("/", auth, postCtrl.upload);
 router.put("/:postID", auth, postCtrl.update);
 router.delete("/:postID", auth, postCtrl.delete);
-// MVC done
+// CRUD done
 router.get("/count", authAdmin, postCtrl.countAll);
 router.get("/countMyPosts", auth, postCtrl.countMyPosts);
 router.patch("/changeActive/:postID", authAdmin, postCtrl.changeActive);
