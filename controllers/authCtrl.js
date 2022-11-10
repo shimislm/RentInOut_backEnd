@@ -4,9 +4,10 @@ const { UserModel } = require("../models/userModel");
 const { createToken , sendResetEmail , sendVerificationEmail } = require("../helpers/userHelper");
 const { UserVerificationModel } = require("../models/UserVerificationModel");
 const path = require("path");
+const { PasswordReset } = require("../models/passwordReset");
 require("dotenv").config();
 
-const salRounds = 10;
+const saltRounds = 10;
 
 exports.authCtrl = {
   
@@ -17,7 +18,7 @@ exports.authCtrl = {
         }
         try {
           let user = new UserModel(req.body);
-          user.password = await bcrypt.hash(user.password, salRounds);
+          user.password = await bcrypt.hash(user.password, saltRounds);
           await user.save();
           user.password = "********";
           // send verification email
@@ -42,27 +43,31 @@ exports.authCtrl = {
       if (!user) {
         return res.status(401).json({ msg_err: "User not found" });
       }
+      
       const validPass = await bcrypt.compare(req.body.password, user.password);
       if (!validPass) {
         return res.status(401).json({ msg_err: "Invalid password" });
       }
       const { active } = user;
+      
       if(!active){
         return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
       }
-      let newToken = createToken(user._id, user.role);
-      return res.json({ token: newToken, active });
+      // let newToken = createToken(user._id, user.role);
+      // console.log(newToken);
+      // return res.json({ token: newToken, active });
+      return res.json({ active });
     } catch (err) {
       return res.status(500).json({ msg_err: "There was an error signing" });
     }
   },
   verifyUser: async (req, res) => {
     let { userId, uniqueString } = req.params;
-    UserVerificationModel.find({ userId }).then((result) => {
+    UserVerificationModel.findOne({ userId }).then((result) => {
       //check if user exist in system
-        if (result.length > 0) {
-          const { expiresAt } = result[0];
-          const hashedUniqueString = result[0].uniqueString;
+        if (result) {
+          const { expiresAt } = result;
+          const hashedUniqueString = result.uniqueString;
           if (expiresAt < (Date.now()+ 2* 60* 60*1000)) {
             //checkes if link expired and sent a messege, delete verify collection in db
             UserVerificationModel.deleteOne({ userId })
@@ -87,36 +92,21 @@ exports.authCtrl = {
               .then(result => {
                 if (result) {
                   // update user to active state
-                  UserModel
-                    .updateOne({ _id: userId }, { active: true })
+                  UserModel.updateOne({ _id: userId }, { active: true })
                     .then(() => {
                       // delet verify user collection when verified
                       UserVerificationModel.deleteOne({ userId })
                         .then(() => {
-                          res.sendFile(path.join(__dirname, "./../views/verified.html"));
-                        })
+                          res.sendFile(path.join(__dirname, "./../views/verified.html"))})
                         .catch(error => {
                           console.log(error)
                           let message = "an error occurre while finalizing sucssful verification  ";
                           res.redirect(`/users/verified/?error=true&message=${message}`);
-                        })
-                    }
-                    )
-                    .catch(error => {
-                      console.log(error)
-                      let message = "an error occurre while updating user verified ";
-                      res.redirect(`/users/verified/?error=true&message=${message}`);
-                    })
-
+                        })})
                 } else {
                   let message = "invalid verification details passed.check your inbox.";
                   res.redirect(`/users/verified/?error=true&message=${message}`);
                 }
-              })
-              .catch((error) => {
-                console.log(error)
-                let message = "an error occurre while compering unique strings ";
-                res.redirect(`/users/verified/?error=true&message=${message}`);
               })
           }
 
@@ -157,12 +147,62 @@ exports.authCtrl = {
           })
         }
       })
-      .catch(error=>{
-        console.log(error)
-        res.json({
-          status: "failed",
-          message: "an error occured while checking user existing",
-        });
-    })
+  },
+  resetPassword: async (req, res) => {
+    const {userId , resetString , newPassword} = req.body
+    console.log(req.params)
+    try {
+      PasswordReset.findOne({userId})
+        .then(result =>{
+          if(result){
+            const {expiresAt } = result;
+            const hashedResetString = result.resetString;
+            console.log(hashedResetString)
+            if(expiresAt < (Date.now()+ 2* 60* 60*1000)) {
+              // checking if link expired 
+              PasswordReset.deleteOne({userId})
+                .then(()=>{
+                  res.status(401).json({ msg: "Password reset link as expired", err })
+                })
+            }else{
+              //compare reset string with string from db
+              bcrypt.compare(resetString, hashedResetString)
+                .then((result)=>{
+                  if(result){
+                    bcrypt.hash( newPassword, saltRounds)
+                      .then((hashedNewPassword)=>{
+                        console.log(hashedNewPassword)
+                        // update user password
+                        UserModel.updateOne({_id : userId}, {password: hashedNewPassword, updatedAt:new Date(Date.now() + 2 * 60 * 60 * 1000) })
+                          .then(()=>{
+                            // update completed
+                            PasswordReset.deleteOne({userId})
+                             .then(()=>{
+                                res.status(200).json({
+                                  status: "Success",
+                                  message: "Password reset successfully"
+                                })
+                              })
+                          })
+                          .catch(error =>{
+                            res.status(401).json({ msg: "Failed to update user password", error })
+                          })
+                      })
+                  }else{
+                    res.status(401).json({ msg: "Invalid password details"})
+                  }
+                })
+            }
+          }else{
+            // password reset request not found
+            res.status(401).json({ msg: "Password reset request not found"})
+          }
+        })
+
+    } catch (error) {
+        console.log(err);
+        res.status(500).json({ msg: "Checking for existing password recors failed", err })
+    }
+    
   }
 };

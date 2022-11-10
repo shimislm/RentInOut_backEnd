@@ -7,7 +7,6 @@ const { authCtrl } = require("../controllers/authCtrl");
 // authonication routes
 router.post('/', authCtrl.signUp)
 
-
 router.get("/verified" , authCtrl.verifiedUser)
 
 router.get("/verify/:userId/:uniqueString" , authCtrl.verifyUser)
@@ -15,6 +14,8 @@ router.get("/verify/:userId/:uniqueString" , authCtrl.verifyUser)
 router.post('/login', authCtrl.login)
 
 router.post("/requestPasswordReset", authCtrl.requestPasswordReset)
+
+router.post("/resetPassword" , authCtrl.resetPassword)
 
 // user routes
 
