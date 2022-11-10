@@ -168,7 +168,6 @@ exports.authCtrl = {
   },
   resetPassword: async (req, res) => {
     const {userId , resetString , newPassword} = req.body
-    console.log(req.params)
     try {
       PasswordReset.findOne({userId})
         .then(result =>{
@@ -189,7 +188,6 @@ exports.authCtrl = {
                   if(result){
                     bcrypt.hash( newPassword, saltRounds)
                       .then((hashedNewPassword)=>{
-                        console.log(hashedNewPassword)
                         // update user password
                         UserModel.updateOne({_id : userId}, {password: hashedNewPassword, updatedAt:new Date(Date.now() + 2 * 60 * 60 * 1000) })
                           .then(()=>{

@@ -6,8 +6,6 @@ const { v4: uuidv4 } = require("uuid");
 const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
-require("dotenv").config();
-
 exports.createToken = (_id, role) =>{
     let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"180mins"})
     return token;
@@ -19,8 +17,8 @@ let transporter = nodemailer.createTransport({
   port: 465,
   secure: true, // use SSL
   auth: {
-    user: process.env.AUTH_EMAIL,
-    pass: process.env.AUTH_PASS
+    user: config.gmailUser,
+    pass: config.gmailPass
   }
 });
 

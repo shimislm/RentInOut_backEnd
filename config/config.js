@@ -5,5 +5,7 @@ exports.config = {
     passDb:process.env.PASS_DB,
     tokenSecret:process.env.TOKEN_SECRET,
     superID: process.env.ADMIN_ID,
-    domain : process.env.DOMAIN
+    domain : process.env.DOMAIN,
+    gmailUser: process.env.AUTH_EMAIL,
+    gmailPass: process.env.AUTH_PASS
   }
