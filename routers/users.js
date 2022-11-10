@@ -9,25 +9,18 @@ const passport = require("passport");
 router.post('/', authCtrl.signUp)
 
 
-router.get("/verified", authCtrl.verifiedUser)
+router.get("/verified" , authCtrl.verifiedUser)
 
 router.get("/verify/:userId/:uniqueString", authCtrl.verifyUser)
 
 router.post('/login', authCtrl.login)
 
-router.get('/auth/google', passport.authenticate('google',
-    { scope: ['email', 'profile'] }));
-router.get( '/google/callback',
-passport.authenticate( 'google', {
-    successRedirect: '/protected',
-    failureRedirect: '/auth/google/failure'
-}));
-router.get('/auth/google/failure', async(req,res) =>{
-    res.json({err:"something went wrong"})
-  })
-router.get('/protected', isLoggedIn, async(req,res) =>{
-    res.json({msg:"hello friend"})
-  })
+
+router.post("/requestPasswordReset", authCtrl.requestPasswordReset)
+
+router.post("/resetPassword" , authCtrl.resetPassword)
+
+// user routes
 
 router.get("/userList", authAdmin, userCtrl.getUsersList)
 

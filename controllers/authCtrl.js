@@ -1,133 +1,83 @@
 const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
-const { createToken, mailOptions } = require("../helpers/userHelper");
+const {  sendResetEmail , sendVerificationEmail , createToken} = require("../helpers/userHelper");
 const { UserVerificationModel } = require("../models/UserVerificationModel");
-const nodemailer = require("nodemailer");
-const passport = require("passport")
-const { v4: uuidv4 } = require("uuid");
 const path = require("path");
+const { PasswordReset } = require("../models/passwordReset");
 require("dotenv").config();
 
-const salRounds = 10;
-// import email props
-let transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // use SSL
-  auth: {
-    user: process.env.AUTH_EMAIL,
-    pass: process.env.AUTH_PASS
-  }
-});
 
-
-const sendVerificationEmail = async ({ _id, email }, res) => {
-  // console.log("email " + email)
-  // console.log("id " + _id)
-  // creat an unique string
-  const uniqueString = uuidv4() + _id;
-  // create email options for spcific collection 
-  let mail = mailOptions(_id, uniqueString, email);
-  await bcrypt.hash(uniqueString, salRounds)
-    // hashed the unique string
-    .then((hasheduniqueString) => {
-      // create ne collection in verify user model
-      const userVerification = new UserVerificationModel({
-        userId: _id,
-        uniqueString: hasheduniqueString,
-      });
-      userVerification.save()
-        .then(() => {
-          // send the email notification
-          transporter.sendMail(mail, (err, info) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log('Message sent: %s', info.response);
-
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          res.json({
-            status: "failed",
-            message: "an error  cant save",
-          });
-        })
-
-    })
-};
+const saltRounds = 10;
 
 exports.authCtrl = {
+  
+    signUp: async (req, res) => {
+        let validBody = validateUser(req.body);
+        if (validBody.error) {
+          return res.status(400).json(validBody.error.details);
+        }
+        try {
+          let user = new UserModel(req.body);
+          user.password = await bcrypt.hash(user.password, saltRounds);
+          await user.save();
+          user.password = "********";
+          // send verification email
+          sendVerificationEmail(user, res);
+          res.status(201).json(user);
+        }
+        catch (err) {
+          if (err.code == 11000) {
+            return res.status(500).json({ msg: "Email already in system, try log in", code: 11000 })
+          }
+          console.log(err);
+          res.status(500).json({ msg: "err", err })
+        }
+      },
+      login: async (req, res) => {
+        const validBody = validateUserLogin(req.body);
+        if (validBody.error) {
+          return res.status(401).json({ msg_err: validBody.error.details });
+        }
+        try {
+          const user = await UserModel.findOne({ email: req.body.email });
+          if (!user) {
+            return res.status(401).json({ msg_err: "User not found" });
+          }
+          const validPass = await bcrypt.compare(req.body.password, user.password);
+          if (!validPass) {
+            return res.status(401).json({ msg_err: "Invalid password" });
+          }
+          const { active } = user;
+          if (!active) {
+            return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
+          }
+          let newToken = createToken(user._id, user.role);
+          return res.json({ token: newToken, active });
+          // return res.json({active });
+        } catch (err) {
+          return res.status(500).json({ msg_err: "There was an error signing" });
+        }
+      },
 
-  signUp: async (req, res) => {
-    let validBody = validateUser(req.body);
-    if (validBody.error) {
-      return res.status(400).json(validBody.error.details);
-    }
-    try {
-      let user = new UserModel(req.body);
-      user.password = await bcrypt.hash(user.password, salRounds);
-      await user.save();
-      user.password = "********";
-      // send verification email
-      sendVerificationEmail(user, res);
-      res.status(201).json(user);
-    }
-    catch (err) {
-      if (err.code == 11000) {
-        return res.status(500).json({ msg: "Email already in system, try log in", code: 11000 })
-      }
-      console.log(err);
-      res.status(500).json({ msg: "err", err })
-    }
-  },
-  login: async (req, res) => {
-    const validBody = validateUserLogin(req.body);
-    if (validBody.error) {
-      return res.status(401).json({ msg_err: validBody.error.details });
-    }
-    try {
-      const user = await UserModel.findOne({ email: req.body.email });
-      if (!user) {
-        return res.status(401).json({ msg_err: "User not found" });
-      }
-      const validPass = await bcrypt.compare(req.body.password, user.password);
-      if (!validPass) {
-        return res.status(401).json({ msg_err: "Invalid password" });
-      }
-      const { active } = user;
-      if (!active) {
-        return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
-      }
-      let newToken = createToken(user._id, user.role);
-      return res.json({ token: newToken, active });
-    } catch (err) {
-      return res.status(500).json({ msg_err: "There was an error signing" });
-    }
-  },
-  googleFailure : async(req,res) =>{
-    res.json({err:"something went wrong"})
-  },
-  connectGoogle: async(req,res) =>{
-    res.json({msg:"hello friend"})
-  },
   verifyUser: async (req, res) => {
     let { userId, uniqueString } = req.params;
-    UserVerificationModel.find({ userId }).then((result) => {
+    UserVerificationModel.findOne({ userId }).then((result) => {
       //check if user exist in system
-      if (result.length > 0) {
-        const { expiresAt } = result[0];
-        const hashedUniqueString = result[0].uniqueString;
-        if (expiresAt < (Date.now() + 2 * 60 * 60 * 1000)) {
-          //checkes if link expired and sent a messege, delete verify collection in db
-          UserVerificationModel.deleteOne({ userId })
+
+        if (result) {
+          const { expiresAt } = result;
+          const hashedUniqueString = result.uniqueString;
+          if (expiresAt < (Date.now()+ 2* 60* 60*1000)) {
+            //checkes if link expired and sent a messege, delete verify collection in db
+            UserVerificationModel.deleteOne({ userId })
+
             .then(() => {
               UserModel.deleteOne({ _id: userId }).then(() => {
                 let message = "link has expired.please sigh up again ";
                 res.redirect(`/users/verified/?error=true&message=${message}`);
               })
+
                 .catch(() => {
                   let message = "clearing user with expired unique string failed ";
                   res.redirect(`/users/verified/?error=true&message=${message}`);
@@ -138,6 +88,7 @@ exports.authCtrl = {
               let message = "an error occurre while clearing  expired user verification record";
               res.redirect(`/users/verified/?error=true&message=${message}`);
             })
+
         }
         else {
           bcrypt.compare(uniqueString, hashedUniqueString)
@@ -190,5 +141,86 @@ exports.authCtrl = {
   },
   verifiedUser: async (req, res) => {
     res.sendFile(path.join(__dirname, "../views/verified.html"))
+  },
+  requestPasswordReset: async (req,res) =>{
+    const { email , redirectUrl } = req.body;
+    
+    UserModel.findOne({ email })
+      .then((data) => {
+        if(data){
+          // check if user is active
+          if(!data.active){
+            res.json({
+              status: "failed",
+              message: "Email isn't verified yet or account as been suspended, please check your email"
+            })
+          }else{
+            // procced to email reset pasword
+            sendResetEmail(data , redirectUrl , res)
+          }
+        }else{
+          res.json({
+            status: "failed",
+            message: "No account with the supplied email found. Please try again"
+          })
+        }
+      })
+  },
+  resetPassword: async (req, res) => {
+    const {userId , resetString , newPassword} = req.body
+    console.log(req.params)
+    try {
+      PasswordReset.findOne({userId})
+        .then(result =>{
+          if(result){
+            const {expiresAt } = result;
+            const hashedResetString = result.resetString;
+            console.log(hashedResetString)
+            if(expiresAt < (Date.now()+ 2* 60* 60*1000)) {
+              // checking if link expired 
+              PasswordReset.deleteOne({userId})
+                .then(()=>{
+                  res.status(401).json({ msg: "Password reset link as expired", err })
+                })
+            }else{
+              //compare reset string with string from db
+              bcrypt.compare(resetString, hashedResetString)
+                .then((result)=>{
+                  if(result){
+                    bcrypt.hash( newPassword, saltRounds)
+                      .then((hashedNewPassword)=>{
+                        console.log(hashedNewPassword)
+                        // update user password
+                        UserModel.updateOne({_id : userId}, {password: hashedNewPassword, updatedAt:new Date(Date.now() + 2 * 60 * 60 * 1000) })
+                          .then(()=>{
+                            // update completed
+                            PasswordReset.deleteOne({userId})
+                             .then(()=>{
+                                res.status(200).json({
+                                  status: "Success",
+                                  message: "Password reset successfully"
+                                })
+                              })
+                          })
+                          .catch(error =>{
+                            res.status(401).json({ msg: "Failed to update user password", error })
+                          })
+                      })
+                  }else{
+                    res.status(401).json({ msg: "Invalid password details"})
+                  }
+                })
+            }
+          }else{
+            // password reset request not found
+            res.status(401).json({ msg: "Password reset request not found"})
+          }
+        })
+
+    } catch (error) {
+        console.log(err);
+        res.status(500).json({ msg: "Checking for existing password recors failed", err })
+    }
+    
   }
 };
