@@ -1,7 +1,7 @@
 const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
-const { createToken , sendResetEmail , sendVerificationEmail } = require("../helpers/userHelper");
+const {  sendResetEmail , sendVerificationEmail , createToken} = require("../helpers/userHelper");
 const { UserVerificationModel } = require("../models/UserVerificationModel");
 const path = require("path");
 const { PasswordReset } = require("../models/passwordReset");
@@ -33,34 +33,30 @@ exports.authCtrl = {
           res.status(500).json({ msg: "err", err })
         }
       },
-  login: async (req, res) => {
-    const validBody = validateUserLogin(req.body);
-    if (validBody.error) {
-      return res.status(401).json({ msg_err: validBody.error.details });
-    }
-    try {
-      const user = await UserModel.findOne({ email: req.body.email });
-      if (!user) {
-        return res.status(401).json({ msg_err: "User not found" });
-      }
-      
-      const validPass = await bcrypt.compare(req.body.password, user.password);
-      if (!validPass) {
-        return res.status(401).json({ msg_err: "Invalid password" });
-      }
-      const { active } = user;
-      
-      if(!active){
-        return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
-      }
-      // let newToken = createToken(user._id, user.role);
-      // console.log(newToken);
-      // return res.json({ token: newToken, active });
-      return res.json({ active });
-    } catch (err) {
-      return res.status(500).json({ msg_err: "There was an error signing" });
-    }
-  },
+      login: async (req, res) => {
+        const validBody = validateUserLogin(req.body);
+        if (validBody.error) {
+          return res.status(401).json({ msg_err: validBody.error.details });
+        }
+        try {
+          const user = await UserModel.findOne({ email: req.body.email });
+          if (!user) {
+            return res.status(401).json({ msg_err: "User not found" });
+          }
+          const validPass = await bcrypt.compare(req.body.password, user.password);
+          if (!validPass) {
+            return res.status(401).json({ msg_err: "Invalid password" });
+          }
+          const { active } = user;
+          if (!active) {
+            return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
+          }
+          let newToken = createToken(user._id, user.role);
+          return res.json({ token: newToken, active });
+        } catch (err) {
+          return res.status(500).json({ msg_err: "There was an error signing" });
+        }
+      },
   verifyUser: async (req, res) => {
     let { userId, uniqueString } = req.params;
     UserVerificationModel.findOne({ userId }).then((result) => {
