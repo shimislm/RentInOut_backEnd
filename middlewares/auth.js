@@ -3,7 +3,7 @@ const { config } = require("../config/config");
 
 exports.isLoggedIn = (req,res,next) =>
 {
-  req.user ? next() : res.sendStatus(401);
+  req.user ? next() : res.status(401).json({err:"something went wrong"});
 }
 exports.auth = async(req,res, next) =>{
     let token = req.header("x-api-key")

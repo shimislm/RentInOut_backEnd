@@ -18,13 +18,10 @@ router.get('/welcome', function (req, res) {
         res.end();
     }
 });
-router.get('/google/callback', passport.authenticate('google', {
-    failureRedirect: "/",
-}),(req,res) =>{
+router.get('/google/callback', passport.authenticate('google', {failureRedirect: "/",}),(req,res) =>{
     req.session.userData = {
         profile: req.user.photos[0].value,
         email: req.user.email,
-        user : req.user
     };
     req.session.loggedin = true;
     req.googleUser = req.user.email;
