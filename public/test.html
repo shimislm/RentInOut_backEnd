@@ -12,7 +12,9 @@
     $.ajax({
         url: "/users/getData", success: function(result){
             var userData = JSON.parse(result);
+            console.log(userData.user.picture)
             $("body").prepend(`
+                <h2>${userData.user.email}</h2>
                 <img src="${userData.profile}">
                 <h1>Welcome ${userData.user.given_name} ${userData.user.family_name}</h1>
                 <a href="/users/logout">log out</a>
