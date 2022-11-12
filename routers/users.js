@@ -14,7 +14,7 @@ router.get('/auth/google', passport.authenticate('google', {
 }))
 router.get('/welcome', authCtrl.loginRegisterGmail);
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: "/", }), authCtrl.callbackGmail);
-router.get('/getData', authCtrl.getUserData);
+// router.get('/getData', authCtrl.getUserData);
 router.get('/logoutGmail', authCtrl.logoutGmail);
 // authonication routes
 router.post('/', authCtrl.signUp)

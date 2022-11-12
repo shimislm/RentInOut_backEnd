@@ -204,55 +204,50 @@ exports.authCtrl = {
   },
   // Gmail controllers
   callbackGmail: async (req, res) => {
-    req.session.userData = {
-      profile: req.user.photos[0].value,
-      email: req.user.email,
-      user: req.user
-    };
     req.session.loggedin = true;
-    req.googleUser = req.user.email;
     res.redirect("/users/welcome");
     res.end();
   },
   logoutGmail: async (req, res) => {
     if (req.session.loggedin) {
       req.session.destroy();
-      res.redirect("/");
       res.end()
     } else {
-      res.redirect("/");
       res.end()
     }
   },
   loginRegisterGmail: async (req, res) => {
     if (req.session.loggedin) {
-      let found = await UserModel.findOne({ email: req.user.email })
-      if (found) {
+      let userFound = await UserModel.findOne({ email: req.user.email })
+      if (userFound) {
         try {
-          req.body = {
-            email: req.user.email,
-            password: found.password
+          const { active } = userFound;
+          if (!active) {
+            return res.status(401).json({ msg_err: "User blocked/ need to verify your email"});
           }
-          return res.json({ email: req.user.email, password: found.password, user: JSON.stringify(req.user) })
+          console.log(userFound._id, userFound.role)
+          let newToken = createToken(userFound._id, userFound.role);
+          return res.json({ token: newToken, active : userFound.active });
         }
         catch (err) {
           return res.json({ err: "There was a problem" })
         }
       }
-      return res.json({ err: "User not register yet..." })
+      return res.json({ code : 404,email: req.user.email, firstName : req.user.given_name, lastName : req.user.family_name, profile : req.user.picture })
+      // return res.json({ err: "User not register yet..." })
     } else {
       res.json({ err: "access denied" });
       res.end();
     }
-  },
-  getUserData: async (req, res) => {
-    if (req.session.loggedin) {
-      var data = JSON.stringify(req.session.userData);
-      res.write(data);
-      res.end();
-    } else {
-      res.write("access denied");
-      res.end();
-    }
   }
+  // getUserData: async (req, res) => {
+  //   if (req.session.loggedin) {
+  //     var data = JSON.stringify(req.session.userData);
+  //     res.write(data);
+  //     res.end();
+  //   } else {
+  //     res.write("access denied");
+  //     res.end();
+  //   }
+  // }
 };
