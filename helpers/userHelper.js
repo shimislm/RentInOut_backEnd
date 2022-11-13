@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { UserVerificationModel } = require("../models/UserVerificationModel");
+const { UserVerificationModel } = require("../models/userVerificationModel");
 const { PasswordReset} = require("../models/passwordReset")
 const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");

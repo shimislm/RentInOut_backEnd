@@ -2,7 +2,7 @@ const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
 const { sendResetEmail, sendVerificationEmail, createToken } = require("../helpers/userHelper");
-const { UserVerificationModel } = require("../models/UserVerificationModel");
+const { UserVerificationModel } = require("../models/userVerificationModel");
 const path = require("path");
 const { PasswordReset } = require("../models/passwordReset");
 require("dotenv").config();
