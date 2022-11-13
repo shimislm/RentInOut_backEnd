@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-  router.get("/",authAdmin , categoryCtrl.getlist)
+router.get("/",authAdmin , categoryCtrl.getlist)
 
 router.post("/",authAdmin , categoryCtrl.addcat)
 
