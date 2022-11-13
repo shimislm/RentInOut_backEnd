@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }))
 app.use(express.json());
-app.use(session({ secret: "cats" }));
+// app.use(session({ secret: "cats" }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")))
