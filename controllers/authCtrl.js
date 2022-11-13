@@ -20,6 +20,7 @@ exports.authCtrl = {
     try {
       let user = new UserModel(req.body);
       user.password = await bcrypt.hash(user.password, saltRounds);
+      user.email= user.email.toLowerCase()
       await user.save();
       user.password = "********";
       // send verification email
@@ -39,8 +40,9 @@ exports.authCtrl = {
     if (validBody.error) {
       return res.status(401).json({ msg_err: validBody.error.details });
     }
+    
     try {
-      const user = await UserModel.findOne({ email: req.body.email });
+      const user = await UserModel.findOne({ email: req.body.email.toLowerCase()});
       if (!user) {
         return res.status(401).json({ msg_err: "User not found" });
       }
