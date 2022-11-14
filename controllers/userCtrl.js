@@ -162,5 +162,45 @@ exports.userCtrl = {
     console.log(err);
     return res.status(500).json({ msg: "err", err });
   }
+  }
+  ,
+  rankUser: async (req , res ) =>{
+    let rankedUserId = req.params.userID
+    const rnk = req.body.rnk
+    console.log(rnk)
+    if (rnk > 5){
+      return res.status(401).json({msg: "Cant rank more than 5"}) 
+    }
+    try {
+      let user = await UserModel.findOne({$and:[{_id: rankedUserId} ,{_id : {$ne : req.tokenData._id}}]})
+      let found
+      // if(user.rank.length >0 ){
+        found = user.rank.some(el => el.user_id === req.tokenData._id);
+      // }
+      if(!found){
+        user.rank.push({user_id: req.tokenData._id,rank:rnk});
+        await user.save()
+        res.status(201).json({msg : "rank succeed"})
+      }
+      else{
+        return res.status(401).json({msg: "Cant rank more than once"}) 
+      }
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "Not possible to rank at this time", err });
+    }
   },
+  avgRank: async (req , res ) =>{
+    let rankedUserId = req.params.userID
+    try {
+      let {rank} = await UserModel.findOne({_id:rankedUserId})
+      let ranks = rank.map(el => el.rank)
+      const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
+      res.status(200).json({average})
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "Error occured rty again later", err });
+    }
+  }
 };

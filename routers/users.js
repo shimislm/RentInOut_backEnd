@@ -31,10 +31,12 @@ router.post("/resetPassword", authCtrl.resetPassword)
 router.get("/userList", authAdmin, userCtrl.getUsersList)
 router.get("/countUsers", authAdmin, userCtrl.countUsers)
 router.get('/info/:id', auth, userCtrl.infoById)
+router.get('/getRank/:userID', userCtrl.avgRank)
 router.put("/:idEdit", auth, userCtrl.edit)
 router.delete("/:idDel", auth, userCtrl.delete)
 router.patch("/changeRole/:userID", authAdmin, userCtrl.changeRole)
 router.patch("/changeActive/:userID", authAdmin, userCtrl.changeActive)
+router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
 
 
 
