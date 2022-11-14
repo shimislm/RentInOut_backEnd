@@ -218,7 +218,7 @@ exports.authCtrl = {
           }
           console.log(userFound._id, userFound.role)
           let newToken = createToken(userFound._id, userFound.role);
-          return res.json({ token: newToken, active : userFound.active });
+          return res.json({ token: newToken, active : userFound.active ,role : userFound.role });
         }
         catch (err) {
           return res.json({ err: "There was a problem" })

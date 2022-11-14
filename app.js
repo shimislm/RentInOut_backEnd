@@ -1,5 +1,5 @@
 const express = require("express");
-require("./helpers/authGoogle")
+require("./helpers/passport")
 const path = require("path");
 const http = require("http");
 const cors = require("cors");
