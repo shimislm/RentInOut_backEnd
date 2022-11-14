@@ -55,7 +55,7 @@ exports.authCtrl = {
         return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
       }
       let newToken = createToken(user._id, user.role);
-      return res.json({ token: newToken, active });
+      return res.json({ token: newToken, active, role: user.role });
       // return res.json({active });
     } catch (err) {
       return res.status(500).json({ msg_err: "There was an error signing" });
