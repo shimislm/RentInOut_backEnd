@@ -196,7 +196,7 @@ exports.authCtrl = {
   // Gmail controllers
   callbackGmail: async (req, res) => {
     req.session.loggedin = true;
-    // res.redirect("/users/welcome");
+    res.redirect("/users/welcome");
     res.end();
   },
   logoutGmail: async (req, res) => {
@@ -214,18 +214,30 @@ exports.authCtrl = {
         try {
           const { active } = userFound;
           if (!active) {
+            localStorage.setItem("googleResp","User blocked/ need to verify your email")
             return res.status(401).json({ msg_err: "User blocked/ need to verify your email"});
           }
           console.log(userFound._id, userFound.role)
           let newToken = createToken(userFound._id, userFound.role);
-          return res.json({ token: newToken, active : userFound.active ,role : userFound.role });
+          let success ={
+            token: newToken,
+             active : userFound.active ,
+             role : userFound.role
+          }
+          localStorage.setItem("googleResp",JSON.stringify(success))
+          return res.json({ msg:"success" });
         }
         catch (err) {
+          localStorage.setItem("googleResp","There was a problem")
           return res.json({ err: "There was a problem" })
         }
       }
-      return res.json({ code : 404,email: req.user.email, firstName : req.user.given_name, lastName : req.user.family_name, profile : req.user.picture })
-      // return res.json({ err: "User not register yet..." })
+      let fail = {
+        code : 404,email: req.user.email, firstName : req.user.given_name, lastName : req.user.family_name, profile : req.user.picture
+      }
+      localStorage.setItem("googleResp",JSON.stringify(fail))
+      // return res.json({ code : 404,email: req.user.email, firstName : req.user.given_name, lastName : req.user.family_name, profile : req.user.picture })
+      return res.json({ err: "User not register yet..." })
     } else {
       res.json({ err: "access denied" });
       res.end();
