@@ -6,7 +6,7 @@ const { authCtrl } = require("../controllers/authCtrl");
 const passport = require("passport");
 const { UserModel } = require("../models/userModel");
 const axios = require("axios")
-
+const seccessLoginUrl = "http://localhost:3000/checkGmail"
 
 //google signIn
 
@@ -14,7 +14,7 @@ router.get('/auth/google', passport.authenticate('google', {
     scope: ['email', 'profile']
 }))
 router.get('/welcome', authCtrl.loginRegisterGmail);
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: "/", }), authCtrl.callbackGmail);
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: "/",successRedirect : seccessLoginUrl}), authCtrl.callbackGmail);
 router.get('/logoutGmail', authCtrl.logoutGmail);
 
 // authonication routes

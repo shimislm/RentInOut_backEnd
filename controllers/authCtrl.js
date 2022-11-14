@@ -196,7 +196,7 @@ exports.authCtrl = {
   // Gmail controllers
   callbackGmail: async (req, res) => {
     req.session.loggedin = true;
-    res.redirect("/users/welcome");
+    // res.redirect("/users/welcome");
     res.end();
   },
   logoutGmail: async (req, res) => {
