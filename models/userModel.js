@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const rank = {
 
+}
 const userSchema = new mongoose.Schema({
   fullName: {
     firstName: String,
@@ -25,9 +27,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  rank: {
-    type: Number,
-    default: 10,
+  rank:{
+    type: [Number],
+    default: [],
   },
   bio: {
     type: String,

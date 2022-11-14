@@ -162,5 +162,25 @@ exports.userCtrl = {
     console.log(err);
     return res.status(500).json({ msg: "err", err });
   }
+  }
+  ,
+  rankUser: async (req , res ) =>{
+    const rankedUserId = req.params.userId
+    rnk = req.body
+    if (rnk > 5){
+      return res.status(401).json({msg: "Cant rank more than 5"}) 
+    }
+    try {
+      const user = await UserModel.findOne({_id: rankedUserId , _id: {$ne: req.tokenData._id}})
+      user.rank.push(rnk);
+      await user.save()
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "Not possible to rank at this time", err });
+    }
   },
+  avgRank: async (req , res ) =>{
+
+  }
 };

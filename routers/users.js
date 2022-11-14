@@ -35,7 +35,7 @@ router.put("/:idEdit", auth, userCtrl.edit)
 router.delete("/:idDel", auth, userCtrl.delete)
 router.patch("/changeRole/:userID", authAdmin, userCtrl.changeRole)
 router.patch("/changeActive/:userID", authAdmin, userCtrl.changeActive)
-
+router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
 
 
 

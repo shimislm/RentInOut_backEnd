@@ -231,14 +231,5 @@ exports.authCtrl = {
       res.end();
     }
   }
-  // getUserData: async (req, res) => {
-  //   if (req.session.loggedin) {
-  //     var data = JSON.stringify(req.session.userData);
-  //     res.write(data);
-  //     res.end();
-  //   } else {
-  //     res.write("access denied");
-  //     res.end();
-  //   }
-  // }
+
 };
