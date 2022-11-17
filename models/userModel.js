@@ -32,10 +32,6 @@ const userSchema = new mongoose.Schema({
     type: Array(rank),
     default: [],
   },
-  bio: {
-    type: String,
-    default: "",
-  },
   productsList: {
     type: [String],
     default: [],
