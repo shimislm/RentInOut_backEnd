@@ -40,7 +40,6 @@ exports.authCtrl = {
     if (validBody.error) {
       return res.status(401).json({ msg_err: validBody.error.details });
     }
-    
     try {
       const user = await UserModel.findOne({ email: req.body.email.toLowerCase()});
       if (!user) {
@@ -55,7 +54,7 @@ exports.authCtrl = {
         return res.status(401).json({ msg_err: "User blocked/ need to verify your email" });
       }
       let newToken = createToken(user._id, user.role);
-      return res.json({ token: newToken, active, role: user.role });
+      return res.json({ token: newToken, user });
       // return res.json({active });
     } catch (err) {
       return res.status(500).json({ msg_err: "There was an error signing" });
