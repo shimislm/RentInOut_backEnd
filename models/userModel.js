@@ -20,11 +20,8 @@ const userSchema = new mongoose.Schema({
   location: String,
   birthdate: Date,
   role: {
-    User: {
-        type: Number,
-        default: 1000
-    },
-    Admin : Number, // 1001
+    type: String,
+    default: "user"
   },
   active: {
     type: Boolean,
