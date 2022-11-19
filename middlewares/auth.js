@@ -8,7 +8,7 @@ exports.isLoggedIn = (req,res,next) =>
 exports.auth = async(req,res, next) =>{
     let token = req.header("x-api-key")
     if(!token) {
-        return res.status(401).json({msg:"plesae send token this end point url "})
+        return res.status(401).json({msg:"please send token this end point url "})
     }
     try{
         let tokenData = jwt.verify(token , config.tokenSecret);

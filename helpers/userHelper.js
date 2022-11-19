@@ -7,8 +7,13 @@ const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 exports.createToken = (_id, role) =>{
-    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"180mins"})
+    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15m"})
     return token;
+}
+
+exports.createRefreshToken = (_id, role) =>{
+  let token = jwt.sign({_id,role}, config.refreshToken,{expiresIn:"14d"})
+  return token;
 }
 const saltRounds = 10;
 // import email props

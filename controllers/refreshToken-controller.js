@@ -1,9 +1,11 @@
-const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { cookie } = require("express/lib/response");
+const { UserModel } = require("../models/userModel");
+const { config } = require("../config/config");
+const { createToken } = require("../helpers/userHelper");
 
 const handleRefreshToken = async (req, res) => {
   try {
+    console.log(req.cookies)
     const cookies = req.cookies;
 
     if (!cookies?.jwt) {
@@ -11,25 +13,21 @@ const handleRefreshToken = async (req, res) => {
     }
     const refreshToken = cookies.jwt;
 
-    const user = await User.findOne({
-      "refreshTokens.refreshToken": refreshToken,
-    });
+    const user = await UserModel.findOne({
+      refreshToken,
+    }).exec();
 
     if (!user) {
-      throw new Error();
+      return res.sendStatus(403);;
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decoded = jwt.verify(refreshToken, config.refreshToken);
 
     if (!decoded || decoded._id !== user._id.toString()) {
-      return res.status(403).json("Forrbiden");
+      return res.status(403).json({msg:"Forrbiden"});
     }
 
-    const accessToken = jwt.sign(
-      { _id: user._id.toString() },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "10m" }
-    );
+    const accessToken = createToken(user._id , user.role)
 
     return res.json({ accessToken });
   } catch (e) {

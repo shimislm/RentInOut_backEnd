@@ -1,9 +1,9 @@
-const { cookie } = require("express/lib/response");
-const User = require("../models/User");
+
+const { UserModel } = require("../models/userModel");
 
 const handleLogout = async (req, res) => {
   const cookies = req.cookies;
-
+  //need to delet access token in client side as well
   try {
     if (!cookies?.jwt || cookies.jwt === "" || cookies.jwt === null || cookies.jwt === undefined) {
       return res.sendStatus(204);
@@ -11,29 +11,25 @@ const handleLogout = async (req, res) => {
 
     const refreshToken = cookies.jwt;
 
-    const user = await User.findOne({
-      "refreshTokens.refreshToken": refreshToken,
-    });
+    const user = await UserModel.findOne({ refreshToken }).exec();
 
     if (!user) {
       res.clearCookie("jwt", {
         httpOnly: true,
         sameSite: "None",
         secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
       });
-      return res.status(204).send("Cookie deleted successfully.");
+      return res.status(204).json({msg :"Cookie deleted successfully."});
     }
-
-    await user.updateOne({
-      $pull: { refreshTokens: { refreshToken: refreshToken } },
-    });
+    // delete in DB
+    user.refreshToken = ''
+    const result = await user.save();
+    console.log(result);
 
     res.clearCookie("jwt", {
       httpOnly: true,
       sameSite: "None",
       secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
     });
     return res.status(204).send("Cookie deleted successfully.");
   } catch (e) {

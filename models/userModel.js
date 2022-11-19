@@ -20,9 +20,11 @@ const userSchema = new mongoose.Schema({
   location: String,
   birthdate: Date,
   role: {
-    type: String,
-    default: "user",
-    enum: ["user", "admin"],
+    User: {
+        type: Number,
+        default: 1000
+    },
+    Admin : Number, // 1001
   },
   active: {
     type: Boolean,
@@ -44,6 +46,8 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: new Date(Date.now() + 2 * 60 * 60 * 1000),
   },
+  refreshToken : String
+
 });
 
 exports.UserModel = mongoose.model("users", userSchema);
