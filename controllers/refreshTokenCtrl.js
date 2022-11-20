@@ -29,7 +29,7 @@ const handleRefreshToken = async (req, res) => {
 
     const accessToken = createToken(user._id , user.role)
 
-    return res.json({ accessToken });
+    return res.json({ accessToken , user });
   } catch (e) {
     return res.status(401).json({ error: "Please authenticate." });
   }
