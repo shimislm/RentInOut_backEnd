@@ -8,7 +8,6 @@ const handleLogout = async (req, res) => {
     if (!cookies?.jwt || cookies.jwt === "" || cookies.jwt === null || cookies.jwt === undefined) {
       return res.sendStatus(204);
     }
-
     const refreshToken = cookies.jwt;
 
     const user = await UserModel.findOne({ refreshToken }).exec();

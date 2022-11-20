@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const logoutCtr = require("../controllers/logout-controller");
+const logoutCtr = require("../controllers/logoutCtrl");
 
 router.get("/", logoutCtr);
 
