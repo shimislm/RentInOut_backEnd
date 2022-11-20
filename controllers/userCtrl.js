@@ -92,7 +92,6 @@ exports.userCtrl = {
           .status(401)
           .json({ msg: "You cant change superadmin to user" });
       }
-      // find a user
       let user = await UserModel.findOne({_id:userID})
       // change is active by opposite
       user.active = !user.active;
