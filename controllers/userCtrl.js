@@ -102,7 +102,7 @@ exports.userCtrl = {
       }
       let data = await UserModel.updateOne(
         { _id: userID },
-        { active: req.body.active }
+        { active: !data.active }
       );
       let user = await UserModel.findOne({_id:userID})
       user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
