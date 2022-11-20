@@ -19,21 +19,21 @@ exports.userCtrl = {
           .json({ msg: "You cant change superadmin to user" });
       }
       if (req.tokenData.role == "admin") {
-          userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+        userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
       }
       else if (req.tokenData._id === id) {
         userInfo = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 });
       }
       else {
         return res
-         .status(401).json({ msg: "Not allowed"})
+          .status(401).json({ msg: "Not allowed" })
       }
-      return res.json({userInfo});
+      return res.json({ userInfo });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: "err", err });
     }
-    },
+  },
   getUsersList: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
@@ -69,14 +69,11 @@ exports.userCtrl = {
           .status(401)
           .json({ msg: "You cant change Superadmin to user" });
       }
-      // find the user 
-      let user = await UserModel.findOne({_id:userID})
-      // change is role to opposite
-      user.role = user.role === "admin" ? "user" : "admin";
-      // Record the time change
-      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      let user = await UserModel.findOne({ _id: userID })
+      user.role = user.role == "admin" ? "user" : "admin";
+      user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
       user.save()
-      return res.json(data);
+      return res.json(user);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: "err", err });
@@ -86,18 +83,16 @@ exports.userCtrl = {
   changeActive: async (req, res) => {
     try {
       let userID = req.params.userID;
-      // cant change the creator
       if (userID == config.superID) {
         return res
           .status(401)
           .json({ msg: "You cant change superadmin to user" });
       }
-      let user = await UserModel.findOne({_id:userID})
-      // change is active by opposite
+      let user = await UserModel.findOne({ _id: userID })
       user.active = !user.active;
-      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
       user.save()
-      return res.json(data);
+      return res.json(user);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -110,14 +105,14 @@ exports.userCtrl = {
       let userInfo;
 
       if (req.tokenData.role == "admin") {
-          userInfo = await UserModel.deleteOne({ _id: idDel }, { password: 0 });
+        userInfo = await UserModel.deleteOne({ _id: idDel }, { password: 0 });
       }
       else if (req.tokenData._id === idDel) {
         userInfo = await UserModel.deleteOne({ _id: req.tokenData._id }, { password: 0 });
       }
       else {
         return res
-         .status(401).json({ msg: "Not allowed"})
+          .status(401).json({ msg: "Not allowed" })
       }
       res.json(userInfo);
     }
@@ -134,46 +129,46 @@ exports.userCtrl = {
     try {
       let idEdit = req.params.idEdit;
       let user;
-      if(req.body.email || req.body.password){
-        return res.status(401).json({msg: "email/pasword change is not allowed"})
+      if (req.body.email || req.body.password) {
+        return res.status(401).json({ msg: "email/pasword change is not allowed" })
       }
       if (req.tokenData.role === "admin") {
-          user = await UserModel.updateOne({ _id: idEdit },req.body );
+        user = await UserModel.updateOne({ _id: idEdit }, req.body);
       }
       else {
-        user = await UserModel.updateOne({ _id: idEdit,_id: req.tokenData._id },req.body);
+        user = await UserModel.updateOne({ _id: idEdit, _id: req.tokenData._id }, req.body);
       }
-      user = await UserModel.findOne({_id:idEdit})
-      user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
+      user = await UserModel.findOne({ _id: idEdit })
+      user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
       user.save()
       return res.status(200).json({ msg: user })
-  }
-  catch (err) {
-    console.log(err);
-    return res.status(500).json({ msg: "err", err });
-  }
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "err", err });
+    }
   }
   ,
-  rankUser: async (req , res ) =>{
+  rankUser: async (req, res) => {
     let rankedUserId = req.params.userID
     const rnk = req.body.rnk
     console.log(rnk)
-    if (rnk > 5){
-      return res.status(401).json({msg: "Cant rank more than 5"}) 
+    if (rnk > 5) {
+      return res.status(401).json({ msg: "Cant rank more than 5" })
     }
     try {
-      let user = await UserModel.findOne({$and:[{_id: rankedUserId} ,{_id : {$ne : req.tokenData._id}}]})
+      let user = await UserModel.findOne({ $and: [{ _id: rankedUserId }, { _id: { $ne: req.tokenData._id } }] })
       let found
       // if(user.rank.length >0 ){
-        found = user.rank.some(el => el.user_id === req.tokenData._id);
+      found = user.rank.some(el => el.user_id === req.tokenData._id);
       // }
-      if(!found){
-        user.rank.push({user_id: req.tokenData._id,rank:rnk});
+      if (!found) {
+        user.rank.push({ user_id: req.tokenData._id, rank: rnk });
         await user.save()
-        res.status(201).json({msg : "rank succeed"})
+        res.status(201).json({ msg: "rank succeed" })
       }
-      else{
-        return res.status(401).json({msg: "Cant rank more than once"}) 
+      else {
+        return res.status(401).json({ msg: "Cant rank more than once" })
       }
     }
     catch (err) {
@@ -181,13 +176,13 @@ exports.userCtrl = {
       return res.status(500).json({ msg: "Not possible to rank at this time", err });
     }
   },
-  avgRank: async (req , res ) =>{
+  avgRank: async (req, res) => {
     let rankedUserId = req.params.userID
     try {
-      let {rank} = await UserModel.findOne({_id:rankedUserId})
+      let { rank } = await UserModel.findOne({ _id: rankedUserId })
       let ranks = rank.map(el => el.rank)
       const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-      res.status(200).json({average})
+      res.status(200).json({ average })
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: "Error occured rty again later", err });

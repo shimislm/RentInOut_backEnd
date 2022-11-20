@@ -7,12 +7,12 @@ const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 exports.createToken = (_id, role) =>{
-    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15s"})
+    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
 }
 
 exports.createRefreshToken = (_id, role) =>{
-  let token = jwt.sign({_id,role}, config.refreshToken,{expiresIn:"14s"})
+  let token = jwt.sign({_id,role}, config.refreshToken,{expiresIn:"14m"})
   return token;
 }
 const saltRounds = 10;
