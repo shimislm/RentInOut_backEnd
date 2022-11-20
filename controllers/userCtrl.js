@@ -62,23 +62,18 @@ exports.userCtrl = {
   },
 
   changeRole: async (req, res) => {
-    if (!req.body.role) {
-      return res.status(400).json({ msg: "Need to send role in body with json format" });
-    }
-
     try {
       let userID = req.params.userID;
-
       if (userID == config.superID) {
         return res
           .status(401)
           .json({ msg: "You cant change Superadmin to user" });
       }
-      let data = await UserModel.updateOne(
-        { _id: userID },
-        { role: req.body.role }
-      );
+      // find the user 
       let user = await UserModel.findOne({_id:userID})
+      // change is role to opposite
+      user.role = user.role === "admin" ? "user" : "admin";
+      // Record the time change
       user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
       user.save()
       return res.json(data);
@@ -89,22 +84,18 @@ exports.userCtrl = {
   },
 
   changeActive: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
-
     try {
       let userID = req.params.userID;
+      // cant change the creator
       if (userID == config.superID) {
         return res
           .status(401)
           .json({ msg: "You cant change superadmin to user" });
       }
-      let data = await UserModel.updateOne(
-        { _id: userID },
-        { active: req.body.active }
-      );
+      // find a user
       let user = await UserModel.findOne({_id:userID})
+      // change is active by opposite
+      user.active = !user.active;
       user.updatedAt = new Date(Date.now() +2 * 60 * 60 * 1000)
       user.save()
       return res.json(data);

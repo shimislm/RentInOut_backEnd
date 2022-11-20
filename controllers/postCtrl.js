@@ -2,7 +2,6 @@ const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel")
 const { validatePost } = require("../validations/postValid");
-const _ = require("lodash")
 const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
