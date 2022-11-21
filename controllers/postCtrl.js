@@ -12,9 +12,10 @@ exports.postCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
         try {
             let posts = await PostModel
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse });
+                .find({})
+                .limit(perPage)
+                .skip((page - 1) * perPage)
+                .sort({ [sort]: reverse })
             res.json(posts);
         }
         catch (err) {
