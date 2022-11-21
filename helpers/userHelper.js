@@ -7,8 +7,13 @@ const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 exports.createToken = (_id, role) =>{
-    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"180mins"})
+    let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
+}
+
+exports.createRefreshToken = (_id, role) =>{
+  let token = jwt.sign({_id,role}, config.refreshToken,{expiresIn:"14m"})
+  return token;
 }
 const saltRounds = 10;
 // import email props
@@ -22,7 +27,7 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-exports.mailOptions = (_id="",_uniqueString="",_email , _subject , _html) => {
+exports.mailOptions = (_email , _subject , _html) => {
     const mailOptions = {
       from: config.gmailUser,
       to: _email,

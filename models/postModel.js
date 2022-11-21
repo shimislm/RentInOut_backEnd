@@ -46,7 +46,7 @@ const postSchema = new mongoose.Schema({
         type: Array(likesObject),
         default: []
     },
-    craetedAt :{
+    createdAt :{
         type: Date,
         default: new Date(Date.now() +2 * 60 * 60 * 1000)
     },

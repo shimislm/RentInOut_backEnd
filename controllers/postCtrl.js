@@ -2,15 +2,14 @@ const { config } = require("dotenv");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel")
 const { validatePost } = require("../validations/postValid");
-const _ = require("lodash")
 const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
     getAll: async (req, res) => {
-        let perPage = Math.min(req.query.perPage, 20) || 10;
-        let page = req.query.page || 1;
-        let sort = req.query.sort || "_id";
-        let reverse = req.query.reverse == "yes" ? -1 : 1
+        let perPage = Math.min(req.query.perPage, 20) || 5;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "createdAt";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
         try {
             let posts = await PostModel
                 .find({})
@@ -124,22 +123,17 @@ exports.postCtrl = {
         }
     },
     changeActive: async (req, res) => {
-        if (!req.body.active && req.body.active != false) {
-            return res.status(400).json({ msg: "Need to send active in body" });
-        }
         try {
             let postID = req.params.postID;
             if (postID == config.superID) {
                 return res.status(401).json({ msg: "You cant change superadmin to user" });
             }
-            let data = await PostModel.updateOne({ _id: postID }, { active: req.body.active });
-
-            //update the change time 
             let post = await PostModel.findOne({ _id: postID })
+            post.active= !post.active;
             post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
             post.save()
 
-            return res.json(data);
+            return res.json(post);
         } catch (err) {
             console.log(err);
             res.status(500).json({ msg: "err", err });
@@ -148,7 +142,7 @@ exports.postCtrl = {
     userPosts: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
-        let sort = req.query.sort || "_id";
+        let sort = req.query.sort || "createdAt";
         let reverse = req.query.reverse == "yes" ? -1 : 1
         try {
             let posts = await PostModel
