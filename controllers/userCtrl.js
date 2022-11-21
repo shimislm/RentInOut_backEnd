@@ -135,7 +135,7 @@ exports.userCtrl = {
       if (req.tokenData.role === "admin") {
         user = await UserModel.updateOne({ _id: idEdit }, req.body);
       }
-      else {
+      else if(idEdit === req.tokenData._id) {
         user = await UserModel.updateOne({ _id: idEdit, _id: req.tokenData._id }, req.body);
       }
       user = await UserModel.findOne({ _id: idEdit })
