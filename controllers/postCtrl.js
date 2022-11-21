@@ -123,15 +123,12 @@ exports.postCtrl = {
         }
     },
     changeActive: async (req, res) => {
-        if (!req.body.active && req.body.active != false) {
-            return res.status(400).json({ msg: "Need to send active in body" });
-        }
         try {
             let postID = req.params.postID;
             if (postID == config.superID) {
                 return res.status(401).json({ msg: "You cant change superadmin to user" });
             }
-            let data = await PostModel.updateOne({ _id: postID }, { active: req.body.active });
+            let data = await PostModel.updateOne({ _id: postID }, { active: !active });
 
             //update the change time 
             let post = await PostModel.findOne({ _id: postID })
