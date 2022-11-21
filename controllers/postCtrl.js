@@ -128,10 +128,8 @@ exports.postCtrl = {
             if (postID == config.superID) {
                 return res.status(401).json({ msg: "You cant change superadmin to user" });
             }
-            let data = await PostModel.updateOne({ _id: postID }, { active: !active });
-
-            //update the change time 
             let post = await PostModel.findOne({ _id: postID })
+            post.active= !post.active;
             post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
             post.save()
 
