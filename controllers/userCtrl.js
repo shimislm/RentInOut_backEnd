@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
@@ -38,7 +38,7 @@ exports.userCtrl = {
     let sort = req.query.sort || "role";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await UserModel.find({}, { password: 0 })
+      let data = await UserModel.find({_id: { $ne: config.superID }}, { password: 0 })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });

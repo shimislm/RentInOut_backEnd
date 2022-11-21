@@ -7,16 +7,14 @@ const MIN = 0;
 exports.postCtrl = {
     getAll: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 5;
-        let page = req.query.page || 1;
-        let sort = req.query.sort || "createdAt";
-
-        let reverse = req.query.reverse == "yes" ? -1 : 1
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "createdAt";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
         try {
             let posts = await PostModel
-                .find({})
-                .limit(perPage)
-                .skip((page - 1) * perPage)
-                .sort({ [sort]: reverse })
+            .limit(perPage)
+            .skip((page - 1) * perPage)
+            .sort({ [sort]: reverse });
             res.json(posts);
         }
         catch (err) {
