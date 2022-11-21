@@ -6,9 +6,10 @@ const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
     getAll: async (req, res) => {
-        let perPage = Math.min(req.query.perPage, 20) || 10;
+        let perPage = Math.min(req.query.perPage, 20) || 5;
         let page = req.query.page || 1;
         let sort = req.query.sort || "createdAt";
+
         let reverse = req.query.reverse == "yes" ? -1 : 1
         try {
             let posts = await PostModel

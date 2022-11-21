@@ -35,9 +35,9 @@ exports.userCtrl = {
     }
   },
   getUsersList: async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let perPage = Math.min(req.query.perPage, 20) || 5;
     let page = req.query.page || 1;
-    let sort = req.query.sort || "_id";
+    let sort = req.query.sort || "role";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let data = await UserModel
