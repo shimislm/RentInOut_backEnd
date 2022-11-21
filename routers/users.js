@@ -4,8 +4,7 @@ const router = express.Router();
 const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
 const passport = require("passport");
-const { UserModel } = require("../models/userModel");
-const axios = require("axios")
+const { mailMe } = require("../controllers/sendEmail");
 const seccessLoginUrl = "http://localhost:3000/checkGmail"
 
 //google signIn
@@ -25,6 +24,7 @@ router.get("/verify/:userId/:uniqueString", authCtrl.verifyUser)
 router.post('/login', authCtrl.login)
 router.post("/requestPasswordReset", authCtrl.requestPasswordReset)
 router.post("/resetPassword", authCtrl.resetPassword)
+router.post("/clientEmail", mailMe.sendEmail)
 
 // user routes
 

@@ -5,6 +5,7 @@ const { sendResetEmail, sendVerificationEmail, createToken } = require("../helpe
 const { UserVerificationModel } = require("../models/userVerificationModel");
 const path = require("path");
 const { PasswordReset } = require("../models/passwordReset");
+const { config } = require("../config/config")
 require("dotenv").config();
 
 
@@ -229,6 +230,29 @@ exports.authCtrl = {
       res.json({ err: "access denied" });
       res.end();
     }
-  }
-
+  },
+  //  sendEmail: async({_id } ,   res )=>{
+  //  const user = await findOne({_id})
+    
+  //   const html = `<div>
+  //   <p>${user.fullName.firstName } ${user.fullName.lastName }</p>
+  //   <p>${user.email }</p>
+  //   <p>${user.phone }</p>
+  //   <p>${user.textarea }</p>
+  //   </div>
+  //   `;
+   
+  //   let mail = mailOptions( `ido12301f@gmail.com` , `New messege from ${user.phone }`, html)
+  //  try{
+  //   transporter.sendMail(mail , (err, info) => {
+  //     res.json({
+  //       status: "Pending",
+  //       message: "The message sent successfully"
+  //     })
+  //   })
+  //  }
+  //  catch (err) {
+  //   return res.json({ err: "There was a problem" })
+  // }
+  // }
 };

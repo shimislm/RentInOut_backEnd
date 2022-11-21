@@ -22,7 +22,7 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-const mailOptions = (_id,_uniqueString,_email , _subject , _html) => {
+exports.mailOptions = (_id,_uniqueString,_email , _subject , _html) => {
     const mailOptions = {
       from: process.env.AUTH_EMAIL,
       to: _email,
