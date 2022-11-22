@@ -33,7 +33,7 @@ exports.userCtrl = {
     }
   },
   getUsersList: async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 5;
+    let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
     let sort = req.query.sort || "role";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
@@ -187,4 +187,21 @@ exports.userCtrl = {
         .json({ msg: "Error occured rty again later", err });
     }
   },
+    search: async (req, res) => {
+        let perPage = Math.min(req.query.perPage, 20) || 10;
+        let page = req.query.page || 1;
+        try {
+            let searchQ = req.query?.s;
+            let searchReg = new RegExp(searchQ, "i");
+            let users = await UserModel.find({ $or: [{ "fullName.firstName" : searchReg  },{ "fullName.lastName" : searchReg  },{ email: searchReg }, { phone: searchReg }] 
+            })
+                .limit(perPage)
+                .skip((page - 1) * perPage)
+            res.json(users);
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).json({ err: err });
+        }
+    },
 };
