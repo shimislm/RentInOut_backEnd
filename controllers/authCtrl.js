@@ -66,6 +66,20 @@ exports.authCtrl = {
       return res.status(500).json({ msg : "There was an error signing" });
     }
   },
+  loginWithToken : async (req,res) =>{
+    try {
+      let user = await UserModel.findOne({ _id: req.token._id});
+      if (!user) {
+        return res.status(401).json({ msg : "User not found" });
+      }
+      const { active } = user;
+      if (!active) {
+        return res.status(401).json({ msg : "User blocked/ need to verify your email" });
+      }
+    } catch (error) {
+      
+    }
+  },
 
   verifyUser: async (req, res) => {
     let { userId, uniqueString } = req.params;
@@ -248,28 +262,4 @@ exports.authCtrl = {
       res.end();
     }
   },
-  //  sendEmail: async({_id } ,   res )=>{
-  //  const user = await findOne({_id})
-    
-  //   const html = `<div>
-  //   <p>${user.fullName.firstName } ${user.fullName.lastName }</p>
-  //   <p>${user.email }</p>
-  //   <p>${user.phone }</p>
-  //   <p>${user.textarea }</p>
-  //   </div>
-  //   `;
-   
-  //   let mail = mailOptions( `ido12301f@gmail.com` , `New messege from ${user.phone }`, html)
-  //  try{
-  //   transporter.sendMail(mail , (err, info) => {
-  //     res.json({
-  //       status: "Pending",
-  //       message: "The message sent successfully"
-  //     })
-  //   })
-  //  }
-  //  catch (err) {
-  //   return res.json({ err: "There was a problem" })
-  // }
-  // }
 };
