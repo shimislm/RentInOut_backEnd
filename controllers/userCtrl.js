@@ -12,11 +12,11 @@ exports.userCtrl = {
     try {
       let id = req.params.id;
       let userInfo;
-      if (id == config.superID) {
-        return res
-          .status(401)
-          .json({ msg: "You cant change superadmin to user" });
-      }
+      // if (id == config.superID) {
+      //   return res
+      //     .status(401)
+      //     .json({ msg: "You cant change superadmin to user" });
+      // }
       if (req.tokenData.role == "admin") {
         userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
       } else if (req.tokenData._id === id) {
