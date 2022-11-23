@@ -8,6 +8,7 @@ exports.userCtrl = {
     res.json(req.tokenData);
   },
   infoById: async (req, res) => {
+    console.log(req.body)
     try {
       let id = req.params.id;
       let userInfo;
