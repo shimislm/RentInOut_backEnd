@@ -22,16 +22,16 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-exports.mailOptions = (_email , _subject , _html) => {
-    const mailOptions = {
-      from: config.gmailUser,
-      to: _email,
-      subject: _subject,
-      html: _html
-    };
-  
-  return mailOptions;
-  }
+const mailOptions = (_id,_uniqueString,_email , _subject , _html) => {
+  const mailOptions = {
+    from: process.env.AUTH_EMAIL,
+    to: _email,
+    subject: _subject,
+    html: _html
+  };
+
+return mailOptions;
+}
 
 exports.sendVerificationEmail = async({ _id, email }, res) => {
     // console.log("email " + email)
