@@ -39,7 +39,7 @@ exports.userCtrl = {
     let sort = req.query.sort || "role";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await UserModel.find({_id: { $ne: config.superID }}, { password: 0 })
+      let data = await UserModel.find({ _id: { $ne: config.superID } }, { password: 0 })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
@@ -133,12 +133,12 @@ exports.userCtrl = {
       }
       if (req.tokenData.role === "admin") {
         user = await UserModel.updateOne({ _id: idEdit }, req.body);
-      } 
+      }
       else if (idEdit != req.tokenData._id) {
         res.sendStatus(401)
       }
-      else{
-        user = await UserModel.updateOne({ _id: idEdit , _id: req.tokenData._id}, req.body);
+      else {
+        user = await UserModel.updateOne({ _id: idEdit, _id: req.tokenData._id }, req.body);
       }
       // else{ throw new Error}
       return res.status(200).json(user);
@@ -188,21 +188,23 @@ exports.userCtrl = {
         .json({ msg: "Error occured rty again later", err });
     }
   },
-    search: async (req, res) => {
-        let perPage = Math.min(req.query.perPage, 20) || 10;
-        let page = req.query.page || 1;
-        try {
-            let searchQ = req.query?.s;
-            let searchReg = new RegExp(searchQ, "i");
-            let users = await UserModel.find({ $or: [{ "fullName.firstName" : searchReg  },{ "fullName.lastName" : searchReg  },{ email: searchReg }, { phone: searchReg }] 
-            })
-                .limit(perPage)
-                .skip((page - 1) * perPage)
-            res.json(users);
-        }
-        catch (err) {
-            console.log(err);
-            res.status(500).json({ err: err });
-        }
-    },
+  search: async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "role";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
+    try {
+      let searchQ = req.query?.s;
+      let searchReg = new RegExp(searchQ, "i");
+      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } }, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
+        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .sort({ [sort]: reverse });
+      res.json(users);
+    }
+    catch (err) {
+      console.log(err);
+      res.status(500).json({ err: err });
+    }
+  },
 };
