@@ -1,11 +1,10 @@
 const { validateUser, validateUserLogin } = require("../validations/userValid");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
-const { sendResetEmail, sendVerificationEmail, createToken, createRefreshToken } = require("../helpers/userHelper");
+const { sendResetEmail, sendVerificationEmail, createToken} = require("../helpers/userHelper");
 const { UserVerificationModel } = require("../models/userVerificationModel");
 const path = require("path");
 const { PasswordReset } = require("../models/passwordReset");
-const { config } = require("../config/config")
 require("dotenv").config();
 
 
@@ -55,12 +54,7 @@ exports.authCtrl = {
         return res.status(401).json({ msg : "User blocked/ need to verify your email" });
       }
       let newAccessToken = createToken(user._id, user.role);
-      let refreshToken = createRefreshToken(user._id , user.role);
-      user.refreshToken = refreshToken
       const result = await user.save()
-      console.log(result)
-      res.cookie('jwt', refreshToken ,{ httpOnly: true , sameSite: 'None' , maxAge: 14 * 24 * 60 * 60 * 1000 });
-      
       return res.json({ token: newAccessToken  ,  user});
     } catch (err) {
       return res.status(500).json({ msg : "There was an error signing" });

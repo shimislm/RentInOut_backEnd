@@ -10,11 +10,6 @@ exports.createToken = (_id, role) =>{
     let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
 }
-
-exports.createRefreshToken = (_id, role) =>{
-  let token = jwt.sign({_id,role}, config.refreshToken,{expiresIn:"14m"})
-  return token;
-}
 const saltRounds = 10;
 // import email props
 let transporter = nodemailer.createTransport({
