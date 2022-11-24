@@ -2,7 +2,7 @@ const express= require("express");
 const router = express.Router();
 
 router.get("/" , (req,res)=> {
-  res.json({msg:"Index work!!!!!"})
+  res.json({msg:"The server is live"})
 })
 
 module.exports = router;

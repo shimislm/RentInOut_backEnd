@@ -2,7 +2,6 @@ const express = require("express");
 require("./helpers/passport")
 const path = require("path");
 const http = require("http");
-const cookieParser = require("cookie-parser")
 const cors = require("cors");
 const passport = require("passport");
 const session = require("express-session");
@@ -18,7 +17,6 @@ app.use(cors({
     credentials: true,
 }));
 app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }))
-app.use(cookieParser());
 app.use(express.json());
 app.use(session({ secret: "cats" }));
 app.use(passport.initialize());

@@ -7,6 +7,7 @@ exports.config = {
     refreshToken:process.env.REFRESH_TOKEN_SECRET,
     superID: process.env.ADMIN_ID,
     domain : process.env.DOMAIN,
+    domain_client : process.env.DOMAIN_CLIENT,
     gmailUser: process.env.AUTH_EMAIL,
     gmailPass: process.env.AUTH_PASS,
     google_client_id: process.env.GOOGLE_CLIENT_ID,

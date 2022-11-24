@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const rank = {
   user_id: String,
   rank: Number
@@ -16,8 +17,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "https://cdn-icons-png.flaticon.com/128/1077/1077114.png",
   },
-  cover_img: String,
-  location: String,
+  cover_img: {
+    type:String,
+    default : "https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg"
+  },
+  location: {
+    country : String,
+    city : String,
+  },
   birthdate: Date,
   role: {
     type: String,
@@ -42,9 +49,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: new Date(Date.now() + 2 * 60 * 60 * 1000),
-  },
-  refreshToken : String
-
+  }
 });
 
 exports.UserModel = mongoose.model("users", userSchema);
