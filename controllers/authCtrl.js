@@ -80,11 +80,13 @@ exports.authCtrl = {
         if (user) {
           const { expiresAt } = result;
           const hashedUniqueString = result.uniqueString;
+          //checkes if link expired and sent a messege, delete verify collection in db
           if (expiresAt < Date.now() + 2 * 60 * 60 * 1000) {
-            //checkes if link expired and sent a messege, delete verify collection in db
             try{
+              // if expired delete verify collection
               let del = await UserVerificationModel.deleteOne({ userId })
               if(del) {
+                // delete user from DB
                   UserModel.deleteOne({ _id: userId }).then(() => {
                     let message = "link has expired.please sigh up again ";
                     res.redirect(`/users/verified/?error=true&message=${message}`);
@@ -94,7 +96,7 @@ exports.authCtrl = {
                     res.redirect(`/users/verified/?error=true&message=${message}`);
                   };
             }catch(error){
-                let message ="an error occurre while clearing  expired user verification record";
+                let message ="an error occurre while clearing expired user verification record";
                 res.redirect(`/users/verified/?error=true&message=${message}`);
               };
           } else {
@@ -104,7 +106,7 @@ exports.authCtrl = {
                   // update user to active state
                   let update = await UserModel.updateOne({ _id: userId }, { active: true })
                     if(update){
-                      // delet verify user collection when verified
+                      // delete verify user collection when verified
                       let del = await UserVerificationModel.deleteOne({ userId })
                         if(del){
                           res.sendFile(path.join(__dirname, "./../views/verified.html"));
@@ -114,27 +116,29 @@ exports.authCtrl = {
                           res.redirect(`/users/verified/?error=true&message=${message}`)
                         };
                     }else{
+                      // fail on update user collection
                       let message ="an error occurre while updating user verified ";
                       res.redirect(`/users/verified/?error=true&message=${message}`);
                     };
                 }catch {
+                  // couldnt verify user details
                   let message ="invalid verification details passed.check your inbox.";
                   res.redirect(`/users/verified/?error=true&message=${message}`);
                 }
-                //couldnt verify unique string
               }else{
+                //couldnt verify unique string
                 let message ="an error occurre while compering unique strings ";
                 res.redirect(`/users/verified/?error=true&message=${message}`);
               };
           }
         } else {
-          let message =
-            "Account doesnt exist or has been verified already.please sign up or login in.";
+          // account alredy verified or no exist
+          let message ="Account doesnt exist or has been verified already.please sign up or login in.";
           res.redirect(`/users/verified/?error=true&message=${message}`);
         }
     }catch (error) {
-        let message =
-          "an error occurre while checking for existing user Verification record ";
+      // user verification record not found in DB
+        let message ="an error occurre while checking for existing user Verification record ";
         res.redirect(`/users/verified/?error=true&message=${message}`);
       };
   },
@@ -267,28 +271,4 @@ exports.authCtrl = {
       res.end();
     }
   },
-  //  sendEmail: async({_id } ,   res )=>{
-  //  const user = await findOne({_id})
-
-  //   const html = `<div>
-  //   <p>${user.fullName.firstName } ${user.fullName.lastName }</p>
-  //   <p>${user.email }</p>
-  //   <p>${user.phone }</p>
-  //   <p>${user.textarea }</p>
-  //   </div>
-  //   `;
-
-  //   let mail = mailOptions( `ido12301f@gmail.com` , `New messege from ${user.phone }`, html)
-  //  try{
-  //   transporter.sendMail(mail , (err, info) => {
-  //     res.json({
-  //       status: "Pending",
-  //       message: "The message sent successfully"
-  //     })
-  //   })
-  //  }
-  //  catch (err) {
-  //   return res.json({ err: "There was a problem" })
-  // }
-  // }
 };
