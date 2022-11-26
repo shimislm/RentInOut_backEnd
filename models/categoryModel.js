@@ -14,7 +14,11 @@ updatedAt :{
     type: Date,
     default: new Date(Date.now() +2 * 60 * 60 * 1000)
 },
-creator_id: String
+creator_id: String,
+editor_id: {
+    type: String,
+    default: creator_id
+}
 })
 
 
