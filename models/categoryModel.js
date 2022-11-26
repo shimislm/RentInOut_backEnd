@@ -17,7 +17,7 @@ updatedAt :{
 creator_id: String,
 editor_id: {
     type: String,
-    default: creator_id
+    default: ""
 }
 })
 
