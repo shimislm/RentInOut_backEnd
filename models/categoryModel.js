@@ -13,7 +13,8 @@ const categorySchema = new mongoose.Schema({
 updatedAt :{
     type: Date,
     default: new Date(Date.now() +2 * 60 * 60 * 1000)
-}
+},
+creator_id: String
 })
 
 
