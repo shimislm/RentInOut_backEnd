@@ -7,7 +7,6 @@ exports.categoryCtrl = {
     getlist: async(req,res)=> {
         let perPage = req.query.perPage || 50;
         let page = req.query.page || 1;
-      
         try{
           let data = await CategoryModel.find({})
           .limit(perPage)
@@ -81,18 +80,6 @@ exports.categoryCtrl = {
           res.status(500).json({ msg: "err", err });
         }
       }
-      
-      
-    //   router.get("/byId/:id", async(req,res) => {
-    //     try{
-    //       let data = await CategoryModel.findOne({_id:req.params.id})
-    //       res.json(data);
-    //     }
-    //     catch(err){
-    //       console.log(err);
-    //       res.status(500).json({msg:"there error try again later",err})
-    //     }
-    //   })
 }
 
 
