@@ -6,11 +6,12 @@ const { v4: uuidv4 } = require("uuid");
 const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
+const saltRounds = 10;
+
 exports.createToken = (_id, role) =>{
     let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
 }
-const saltRounds = 10;
 // import email props
 let transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
