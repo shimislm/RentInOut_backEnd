@@ -84,8 +84,8 @@ exports.authCtrl = {
           if (expiresAt < Date.now() + 2 * 60 * 60 * 1000) {
             try{
               // if expired delete verify collection
-              let delVer = await UserVerificationModel.deleteOne({ userId })
-              let delUser = await UserModel.deleteOne({ _id: userId })
+              await UserVerificationModel.deleteOne({ userId })
+              await UserModel.deleteOne({ _id: userId })
               let message = "Link has expired. please sigh up again ";
               res.redirect(`/users/verified/?error=true&message=${message}`);
             }catch(error){
@@ -100,7 +100,7 @@ exports.authCtrl = {
                   let update = await UserModel.updateOne({ _id: userId }, { active: true })
                     if(update){
                       // delete verify user collection when verified
-                      let del = await UserVerificationModel.deleteOne({ userId })
+                      await UserVerificationModel.deleteOne({ userId })
                       res.sendFile(path.join(__dirname, "./../views/verified.html"));
                     }else{
                       // fail on update user collection
@@ -109,15 +109,15 @@ exports.authCtrl = {
                     };
                 }catch {
                   // couldnt verify user details
-                  let delVer = await UserVerificationModel.deleteOne({ userId })
-                  let delUser = await UserModel.deleteOne({ _id: userId })
+                  await UserVerificationModel.deleteOne({ userId })
+                  await UserModel.deleteOne({ _id: userId })
                   let message ="invalid verification details passed.check your inbox.";
                   res.redirect(`/users/verified/?error=true&message=${message}`);
                 }
               }else{
                 //couldnt verify unique string
-                let delVer = await UserVerificationModel.deleteOne({ userId })
-                let delUser = await UserModel.deleteOne({ _id: userId })
+                await UserVerificationModel.deleteOne({ userId })
+                await UserModel.deleteOne({ _id: userId })
                 let message ="an error occurre while compering vrification sentence";
                 res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
               };
