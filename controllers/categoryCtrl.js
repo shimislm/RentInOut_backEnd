@@ -29,6 +29,7 @@ exports.categoryCtrl = {
         try{
           let category = new CategoryModel(req.body);
           category.creator_id = req.tokenData._id;
+          category.editor_id = req.tokenData._id;
           await category.save();
 
           return res.json(category);
