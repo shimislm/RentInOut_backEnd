@@ -19,7 +19,6 @@ exports.postCtrl = {
             res.json(posts);
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({ err: err });
         }
     },
@@ -35,7 +34,6 @@ exports.postCtrl = {
             res.status(201).json(post);
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({ err: err });
         }
     },
@@ -87,7 +85,6 @@ exports.postCtrl = {
             let count = await PostModel.countDocuments({});
             res.json({ count });
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -96,7 +93,6 @@ exports.postCtrl = {
             let count = await PostModel.countDocuments({ creator_id: req.tokenData._id });
             res.json({ count });
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -108,17 +104,15 @@ exports.postCtrl = {
             let max = req.query.max || MAX;
             let min = req.query.min || MIN;
             let searchReg = new RegExp(searchQ, "i");
-            // http://localhost:3000/posts/search?s=board&min=10&max=21
-            let books = await PostModel.find({
+            let posts = await PostModel.find({
                 $and: [{ $or: [{ title: searchReg }, { info: searchReg }] },
                 { $and: [{ price: { $gte: min } }, { price: { $lte: max } }] }]
             })
                 .limit(perPage)
                 .skip((page - 1) * perPage)
-            res.json(books);
+            res.json(posts);
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({ err: err });
         }
     },
@@ -135,7 +129,6 @@ exports.postCtrl = {
 
             return res.json(post);
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -153,7 +146,6 @@ exports.postCtrl = {
             res.json(posts);
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({ err: err });
         }
     },
@@ -183,7 +175,6 @@ exports.postCtrl = {
             post.save()
             return res.json(data);
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -211,7 +202,6 @@ exports.postCtrl = {
             await post.save()
             res.status(201).json({ posts: post.likes, msg: "unlike the post" })
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -222,7 +212,6 @@ exports.postCtrl = {
             let likes = await post.likes;
             res.json({ count: likes.length });
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     },
@@ -232,7 +221,6 @@ exports.postCtrl = {
             let post = await PostModel.findOne({ _id: postID })
             res.json({ likes: post.likes.splice(0, 3) })
         } catch (err) {
-            console.log(err);
             res.status(500).json({ msg: "err", err });
         }
     }

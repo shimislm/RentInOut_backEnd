@@ -90,7 +90,7 @@ exports.authCtrl = {
               res.redirect(`/users/verified/?error=true&message=${message}`);
             }catch(error){
                 let message ="an error occurre while clearing expired user verification record";
-                res.redirect(`/users/verified/?error=true&message=${message}`);
+                res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
               };
           } else {
             let result = await bcrypt.compare(uniqueString, hashedUniqueString)
@@ -105,7 +105,7 @@ exports.authCtrl = {
                     }else{
                       // fail on update user collection
                       let message ="an error occurre while updating user verified ";
-                      res.redirect(`/users/verified/?error=true&message=${message}`);
+                      res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
                     };
                 }catch {
                   // couldnt verify user details
@@ -119,12 +119,12 @@ exports.authCtrl = {
                 let delVer = await UserVerificationModel.deleteOne({ userId })
                 let delUser = await UserModel.deleteOne({ _id: userId })
                 let message ="an error occurre while compering vrification sentence";
-                res.redirect(`/users/verified/?error=true&message=${message}`);
+                res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
               };
           }
         } else {
           // account alredy verified or not exist
-          let message ="Account doesnt exist or has been verified already.please sign up or login in.";
+          let message ="Account doesnt exist or has been verified already. Please sign up or login in.";
           res.redirect(`/users/verified/?error=true&message=${message}`);
         }
     }catch (error) {
@@ -132,7 +132,7 @@ exports.authCtrl = {
         let delVer = await UserVerificationModel.deleteOne({ uniqueString })
         let delUser = await UserModel.deleteOne({ _id: userId })
         let message ="an error occurre while checking for existing user Verification record ";
-        res.redirect(`/users/verified/?error=true&message=${message}`);
+        res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
       };
   },
   verifiedUser: async (req, res) => {

@@ -3,11 +3,11 @@ const { authAdmin } = require("../middlewares/auth");
 const { categoryCtrl } = require("../controllers/categoryCtrl");
 const router = express.Router();
 
-router.get("/", authAdmin, categoryCtrl.getlist)
-router.post("/", authAdmin, categoryCtrl.addcat)
-router.put("/:idEdit", authAdmin, categoryCtrl.editcat)
-router.delete("/:idDel", authAdmin, categoryCtrl.delete)
-router.get("/count", authAdmin, categoryCtrl.countCat)
+router.get("/", authAdmin, categoryCtrl.getCategorylist)
+router.post("/", authAdmin, categoryCtrl.addCategory)
+router.put("/:idEdit", authAdmin, categoryCtrl.editCategory)
+router.delete("/:idDel", authAdmin, categoryCtrl.deleteCategory)
+router.get("/count", authAdmin, categoryCtrl.countCategory)
 
 module.exports = router;
 

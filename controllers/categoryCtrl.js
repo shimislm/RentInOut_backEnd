@@ -4,7 +4,7 @@ const {validateCategory} =require("../validations/categoryValid")
 const router = express.Router();
 
 exports.categoryCtrl = {
-    getlist: async(req,res)=> {
+    getCategorylist: async(req,res)=> {
         let perPage = req.query.perPage || 50;
         let page = req.query.page || 1;
         try{
@@ -21,7 +21,7 @@ exports.categoryCtrl = {
       },
       
       
-       addcat : async(req,res) => {
+       addCategory : async(req,res) => {
         let validBody = validateCategory(req.body);
         if(validBody.error){
           res.status(400).json(validBody.error.details)
@@ -40,7 +40,7 @@ exports.categoryCtrl = {
       },
       
       
-     editcat: async(req,res) => {
+     editCategory: async(req,res) => {
         let validBody = validateCategory(req.body);
         if(validBody.error){
           res.status(400).json(validBody.error.details)
@@ -60,7 +60,7 @@ exports.categoryCtrl = {
         }
       },
       
-      delete: async(req,res) => {
+      deleteCategory: async(req,res) => {
         try{
           let idDel = req.params.idDel
           let data = await CategoryModel.deleteOne({_id:idDel});
@@ -71,7 +71,7 @@ exports.categoryCtrl = {
           res.status(500).json({msg:"err",err})
         }
       },
-      countCat: async (req, res) => {
+      countCategory: async (req, res) => {
         try {
           let count = await CategoryModel.countDocuments({});
           res.json({ count });
