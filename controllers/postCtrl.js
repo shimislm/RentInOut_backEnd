@@ -99,6 +99,8 @@ exports.postCtrl = {
     search: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 10;
         let page = req.query.page || 1;
+        let sort = req.query.sort || "createdAt";
+        let reverse = req.query.reverse == "yes" ? -1 : 1;
         try {
             let searchQ = req.query?.s;
             let max = req.query.max || MAX;
@@ -110,6 +112,7 @@ exports.postCtrl = {
             })
                 .limit(perPage)
                 .skip((page - 1) * perPage)
+                .sort({ [sort]: reverse })
             res.json(posts);
         }
         catch (err) {
