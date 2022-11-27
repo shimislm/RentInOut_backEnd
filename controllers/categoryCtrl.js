@@ -31,12 +31,15 @@ exports.categoryCtrl = {
           category.creator_id = req.tokenData._id;
           category.editor_id = req.tokenData._id;
           await category.save();
-
           return res.json(category);
 
         }
         catch(err){
-          console.log(err)
+          if (err.code == 11000) {
+            return res
+              .status(409)
+              .json({ msg: "Category already in system, try different", code: 11000 });
+          }
           return res.status(500).json({msg:"err",err})
         }
       },
