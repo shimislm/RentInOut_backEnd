@@ -8,6 +8,7 @@ router.post("/", authAdmin, categoryCtrl.addCategory)
 router.put("/:idEdit", authAdmin, categoryCtrl.editCategory)
 router.delete("/:idDel", authAdmin, categoryCtrl.deleteCategory)
 router.get("/count", authAdmin, categoryCtrl.countCategory)
+router.get("/search", authAdmin, categoryCtrl.search)
 
 module.exports = router;
 

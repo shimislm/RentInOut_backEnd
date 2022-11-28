@@ -1,7 +1,8 @@
 const express = require("express");
 const { CategoryModel } = require("../models/categoryModel");
 const { validateCategory } = require("../validations/categoryValid");
-const router = express.Router();
+const MAX = 10000000;
+const MIN = 0;
 
 exports.categoryCtrl = {
   getCategorylist: async (req, res) => {
@@ -21,6 +22,26 @@ exports.categoryCtrl = {
       res.status(500).json({ msg: "there error try again later", err });
     }
   },
+  search: async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "createdAt";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
+    try {
+        let searchQ = req.query?.s;
+        let searchReg = new RegExp(searchQ, "i");
+        let category = await CategoryModel.find({
+            $and: [{ $or: [{ name: searchReg }, { info: searchReg ,url_name : searchReg }] },]
+        })
+            .limit(perPage)
+            .skip((page - 1) * perPage)
+            .sort({ [sort]: reverse })
+        res.json(category);
+    }
+    catch (err) {
+        res.status(500).json({ err: err });
+    }
+},
 
   addCategory: async (req, res) => {
     let validBody = validateCategory(req.body);
