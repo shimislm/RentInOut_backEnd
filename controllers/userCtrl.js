@@ -207,4 +207,38 @@ exports.userCtrl = {
       res.status(500).json({ err: err });
     }
   },
+  uploadImg: async (req, res) => {
+    let image = req.body.img;
+    if (image) {
+      try {
+        let user = await UserModel.findOne({ _id: req.tokenData._id })
+        user.profile_img = req.body.img;
+        await user.save()
+        res.status(200).json({ msg: "profile has been changed" })
+      }
+      catch (err) {
+        res.status(500).json({ err })
+      }
+    }
+    else {
+      res.status(404).json({ err: "Must send an image" })
+    }
+  },
+  uploadBanner: async (req, res) => {
+    let banner = req.body.banner;
+    if (banner) {
+      try {
+        let user = await UserModel.findOne({ _id: req.tokenData._id })
+        user.cover_img = req.body.banner;
+        await user.save()
+        res.status(200).json({ msg: "banner has been changed" })
+      }
+      catch (err) {
+        res.status(500).json({ err })
+      }
+    }
+    else {
+      res.status(404).json({ err: "Must send an banner" })
+    }
+  },
 };

@@ -38,6 +38,8 @@ router.delete("/:idDel", auth, userCtrl.delete)
 router.patch("/changeRole/:userID", authAdmin, userCtrl.changeRole)
 router.patch("/changeActive/:userID", authAdmin, userCtrl.changeActive)
 router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
+router.patch("/uploadProfile", auth, userCtrl.uploadImg)
+router.patch("/uploadBanner", auth, userCtrl.uploadBanner)
 
 
 
