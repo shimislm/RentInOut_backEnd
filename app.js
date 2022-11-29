@@ -13,7 +13,7 @@ require("./db/mongoconnect");
 const app = express();
 
 app.use(cors({
-    origin : ["https://rentinout.onrender.com" , "http://rentinout.onrender.com" , "http://localhost:3000"],
+    origin : ["https://rentinout.onrender.com" , "http://rentinout.onrender.com" , "http://localhost:3000", "https://rentinout.netlify.app"],
     credentials: true,
 }));
 app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }))
