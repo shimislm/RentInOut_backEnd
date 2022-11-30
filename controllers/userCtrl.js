@@ -200,7 +200,7 @@ exports.userCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-      res.json(users);
+        return res.json(users);
     }
     catch (err) {
       console.log(err);

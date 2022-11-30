@@ -1,6 +1,6 @@
 const { config } = require("../config/config");
 const nodemailer = require("nodemailer");
-const { mailOptions } = require("../helpers/userHelper");
+// const { mailOptions } = require("../helpers/userHelper");
 
 let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -12,6 +12,13 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+const mailOptions = (_email , _subject , _html) => {
+    const mailOptions = {
+      from: process.env.AUTH_EMAIL,
+      to: _email,
+      subject: _subject,
+      html: _html
+    };
 exports.mailMe = {
     sendEmail: async (req, res) => {
         let subject = "mail send from " + req.body.phone;

@@ -74,6 +74,10 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
   };
 // redirect url is an frontend url were we reset password
   exports.sendResetEmail = async({_id , email} , redirectUrl , res )=>{
+    //if request already in system
+    let request = await PasswordReset.findOne({_id})
+    if(request) await PasswordReset.deleteOne({_id})
+
     const resetString = uuidv4() + _id;
     const html = `<p>We heard that you forgot your password.</p>
     <p>Don't worry, use the link below to reset it.</p>
@@ -94,7 +98,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
             .then(() => {
               // send the email notification
               transporter.sendMail(mail , (err, info) => {
-                res.json({
+                return res.json({
                   status: "Pending",
                   message: "Password reset email sent"
                 })
