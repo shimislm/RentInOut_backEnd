@@ -198,7 +198,7 @@ exports.userCtrl = {
       let searchReg = new RegExp(searchQ, "i");
       let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } }, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
         .limit(perPage)
-        .skip((page - 1) * perPage)
+        .skip((page - 1))
         .sort({ [sort]: reverse });
       res.json(users);
     }
