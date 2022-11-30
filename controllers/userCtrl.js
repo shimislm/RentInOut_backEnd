@@ -185,7 +185,7 @@ exports.userCtrl = {
       console.log(err);
       return res
         .status(500)
-        .json({ msg: "Error occured rty again later", err });
+        .json({ msg: "Error occured try again later", err });
     }
   },
   search: async (req, res) => {
@@ -196,7 +196,7 @@ exports.userCtrl = {
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
-      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID }}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
+      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID }}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] } ,{ password: 0 })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
@@ -215,7 +215,7 @@ exports.userCtrl = {
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
-      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } , role:{ $ne: "admin"}}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
+      let users = await UserModel.find({ $and: [{ role:{ $ne: "admin"}}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] },{ password: 0 })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
