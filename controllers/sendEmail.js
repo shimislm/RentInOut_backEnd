@@ -19,6 +19,7 @@ let mailOptions = (_email , _subject , _html) => {
       subject: _subject,
       html: _html
     };
+    return mailOptions;
 }
 exports.mailMe = {
     sendEmail: async (req, res) => {
