@@ -196,7 +196,26 @@ exports.userCtrl = {
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
-      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } }, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
+      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID }}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
+        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .sort({ [sort]: reverse });
+        return res.json(users);
+    }
+    catch (err) {
+      console.log(err);
+      res.status(500).json({ err: err });
+    }
+  },
+  userSearch: async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "role";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
+    try {
+      let searchQ = req.query?.s;
+      let searchReg = new RegExp(searchQ, "i");
+      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } , role:{ $ne: "admin"}}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
