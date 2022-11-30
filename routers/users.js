@@ -5,7 +5,6 @@ const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
 const passport = require("passport");
 const { mailMe } = require("../controllers/sendEmail");
-// const { mailMe } = require("../controllers/sendEmail")
 const seccessLoginUrl = "http://localhost:3000/checkGmail"
 
 //google signIn
