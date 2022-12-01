@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const cloudinary = {url:String, img_id:String}
-const rank = { 
+const cloudinary = { url: String, img_id: String };
+const rank = {
   user_id: String,
   rank: Number,
 };
@@ -15,12 +15,22 @@ const userSchema = new mongoose.Schema({
   password_changed: Date,
   phone: String,
   profile_img: {
-    type: cloudinary,
-    default: { url:"https://cdn-icons-png.flaticon.com/128/1077/1077114.png", img_id:""},
+    Object: {
+      type: cloudinary,
+      default: {
+        url: "https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg",
+        img_id: "",
+      },
+    },
   },
   cover_img: {
-    type: cloudinary,
-    default: { url:"https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg", img_id:""},
+    Object: {
+      type: cloudinary,
+      default: {
+        url: "https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg",
+        img_id: "",
+      },
+    },
   },
   country: String,
   city: String,
