@@ -90,7 +90,7 @@ exports.authCtrl = {
               res.redirect(`/users/verified/?error=true&message=${message}`);
             }catch(error){
                 let message ="an error occurre while clearing expired user verification record";
-                res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
+                return res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
               };
           } else {
             let result = await bcrypt.compare(uniqueString, hashedUniqueString)
@@ -101,42 +101,42 @@ exports.authCtrl = {
                     if(update){
                       // delete verify user collection when verified
                       await UserVerificationModel.deleteOne({ userId })
-                      res.sendFile(path.join(__dirname, "./../views/verified.html"));
+                      return res.sendFile(path.join(__dirname, "./../views/verified.html"));
                     }else{
                       // fail on update user collection
                       let message ="an error occurre while updating user verified ";
-                      res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
+                      return res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
                     };
                 }catch {
                   // couldnt verify user details
                   await UserVerificationModel.deleteOne({ userId })
                   await UserModel.deleteOne({ _id: userId })
                   let message ="invalid verification details passed.check your inbox.";
-                  res.redirect(`/users/verified/?error=true&message=${message}`);
+                  return res.redirect(`/users/verified/?error=true&message=${message}`);
                 }
               }else{
                 //couldnt verify unique string
                 await UserVerificationModel.deleteOne({ userId })
                 await UserModel.deleteOne({ _id: userId })
                 let message ="an error occurre while compering vrification sentence";
-                res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
+                return res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
               };
           }
         } else {
           // account alredy verified or not exist
           let message ="Account doesnt exist or has been verified already. Please sign up or login in.";
-          res.redirect(`/users/verified/?error=true&message=${message}`);
+          return res.redirect(`/users/verified/?error=true&message=${message}`);
         }
     }catch (error) {
       // user verification record not found in DB
-        let delVer = await UserVerificationModel.deleteOne({ uniqueString })
-        let delUser = await UserModel.deleteOne({ _id: userId })
+        await UserVerificationModel.deleteOne({ uniqueString })
+        await UserModel.deleteOne({ _id: userId })
         let message ="an error occurre while checking for existing user Verification record ";
-        res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
+        return res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
       };
   },
   verifiedUser: async (req, res) => {
-    res.sendFile(path.join(__dirname, "../views/verified.html"));
+    return res.sendFile(path.join(__dirname, "../views/verified.html"));
   },
   requestPasswordReset: async (req, res) => {
     const { email, redirectUrl } = req.body;
@@ -144,13 +144,13 @@ exports.authCtrl = {
       if (data) {
         // check if user is active
         if (!data.active) {
-          res.json({status: "failed", message:"Email isn't verified yet or account as been suspended, please check your email"});
+          return res.json({status: "failed", message:"Email isn't verified yet or account as been suspended, please check your email"});
         } else {
           // procced to email reset pasword
           sendResetEmail(data, redirectUrl, res);
         }
       } else {
-        res.json({status: "failed", message: "No account with the supplied email found. Please try again"});
+        return res.json({status: "failed", message: "No account with the supplied email found. Please try again"});
       }
     });
   },
@@ -165,7 +165,7 @@ exports.authCtrl = {
           // checking if link expired
           let reset = await PasswordReset.deleteOne({ userId });
           if (!reset) {
-            res.status(401).json({ msg: "Password reset link as expired", err });
+            return res.status(401).json({ msg: "Password reset link as expired", err });
           }
         } else {
           //compare reset string with string from db
@@ -188,36 +188,36 @@ exports.authCtrl = {
                 // update completed
                 let reset = await PasswordReset.deleteOne({ userId });
                 if (reset) {
-                  res.status(200).json({status: "Success", msg: "Password reset successfully"});
+                  return res.status(200).json({status: "Success", msg: "Password reset successfully"});
                 } else {
-                  res.status(401).json({ msg: "Failed to update user password", error });
+                  return res.status(401).json({ msg: "Failed to update user password", error });
                 }
               }
             }
           } else {
-            res.status(401).json({ msg: "Invalid password details" });
+            return res.status(401).json({ msg: "Invalid password details" });
           }
         }
       } else {
         // password reset request not found
-        res.status(401).json({ msg: "Password reset request not found" });
+        return res.status(401).json({ msg: "Password reset request not found" });
       }
     } catch (error) {
-      res.status(500).json({ msg: "Checking for existing password recors failed", err });
+      return res.status(500).json({ msg: "Checking for existing password recors failed", err });
     }
   },
   // Gmail controllers
   callbackGmail: async (req, res) => {
     req.session.loggedin = true;
-    res.redirect("/users/welcome");
-    res.end();
+    return res.redirect("/users/welcome");
+    return res.end();
   },
   logoutGmail: async (req, res) => {
     if (req.session.loggedin) {
       req.session.destroy();
-      res.end();
+      return res.end();
     } else {
-      res.end();
+      return res.end();
     }
   },
   loginRegisterGmail: async (req, res) => {
@@ -260,8 +260,7 @@ exports.authCtrl = {
       // return res.json({ code : 404,email: req.user.email, firstName : req.user.given_name, lastName : req.user.family_name, profile : req.user.picture })
       return res.json({ err: "User not register yet..." });
     } else {
-      res.json({ err: "access denied" });
-      res.end();
+      return res.json({ err: "access denied" });
     }
   },
 };

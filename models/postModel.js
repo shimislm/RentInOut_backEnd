@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+
+const cloudinary = {url:String, img_id:String}
 // helper object for likes
 const likesObject = {
     user_id: String,
@@ -11,7 +13,10 @@ const likesObject = {
 const postSchema = new mongoose.Schema({
     title: String,
     info: String,
-    img: String,
+    img: {
+        type: Array(cloudinary),
+        default: []
+    },
     range: {
         type: String,
         enum: ['long-term', 'short-term'],
@@ -40,7 +45,8 @@ const postSchema = new mongoose.Schema({
         type: Date,
         default: new Date(Date.now() +2 * 60 * 60 * 1000)
     },
-    location: String,
+    country: String,
+    city: String,
     category_url: String,
     likes:{
         type: Array(likesObject),

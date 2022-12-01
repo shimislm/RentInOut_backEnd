@@ -4,12 +4,12 @@ exports.validatePost = (_reqBody) => {
   let joiSchema = Joi.object({
     title : Joi.string().min(2).max(50).required(),
     info : Joi.string().min(2).max(1500).required(),
-    img : Joi.string().min(2).max(3000).required(),
     range : Joi.string().valid('long-term','short-term').allow(null,""),
     price : Joi.number().min(1).max(10000000).required(),
     type : Joi.string().valid('rent','exchange','delivery').allow(null,""),
     available_from : Joi.date().min(2).max(50).allow(null,""),
-    location : Joi.string().min(2).max(50).required(),
+    country : Joi.string().min(2).max(50).required(),
+    city: Joi.string().min(2).max(50).required(),
     category_url : Joi.string().min(2).max(50).required()
   });
   return joiSchema.validate(_reqBody);
