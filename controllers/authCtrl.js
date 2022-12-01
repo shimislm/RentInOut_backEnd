@@ -132,7 +132,7 @@ exports.authCtrl = {
         let delVer = await UserVerificationModel.deleteOne({ uniqueString })
         let delUser = await UserModel.deleteOne({ _id: userId })
         let message ="an error occurre while checking for existing user Verification record ";
-        res.status(401).json({msg :`/users/verified/?error=true&message=${message}`});
+        res.redirect(`/users/verified/?error=true&message=${message}`);
       };
   },
   verifiedUser: async (req, res) => {
