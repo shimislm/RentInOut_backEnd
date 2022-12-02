@@ -227,11 +227,12 @@ exports.userCtrl = {
     }
   },
   uploadImg: async (req, res) => {
-    let image = req.body.img;
+    let image = req.body;
+
     if (image) {
       try {
         let user = await UserModel.findOne({ _id: req.tokenData._id })
-        user.profile_img = req.body.img;
+        user.profile_img = req.body;
         await user.save()
         res.status(200).json({ msg: "profile has been changed" })
       }
@@ -244,7 +245,8 @@ exports.userCtrl = {
     }
   },
   uploadBanner: async (req, res) => {
-    let banner = req.body.banner;
+    let banner = req.body;
+    consol.log(banner)
     if (banner) {
       try {
         let user = await UserModel.findOne({ _id: req.tokenData._id })
