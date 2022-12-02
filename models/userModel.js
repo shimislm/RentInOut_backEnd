@@ -15,22 +15,18 @@ const userSchema = new mongoose.Schema({
   password_changed: Date,
   phone: String,
   profile_img: {
-    Object: {
       type: cloudinary,
       default: {
         url: "https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg",
         img_id: "",
       },
-    },
   },
   cover_img: {
-    Object: {
       type: cloudinary,
       default: {
         url: "https://upload.wikimedia.org/wikipedia/commons/4/41/Blank_Earth_Banner.jpg",
         img_id: "",
       },
-    },
   },
   country: String,
   city: String,
