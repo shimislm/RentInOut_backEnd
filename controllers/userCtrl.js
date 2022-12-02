@@ -246,7 +246,7 @@ exports.userCtrl = {
   },
   uploadBanner: async (req, res) => {
     let banner = req.body;
-    consol.log(banner)
+    console.log(banner)
     if (banner) {
       try {
         let user = await UserModel.findOne({ _id: req.tokenData._id })
