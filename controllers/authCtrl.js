@@ -61,11 +61,10 @@ exports.authCtrl = {
       const { active } = user;
       if (!active) {
         return res
-          .status(401)
-          .json({ msg: "User blocked/ need to verify your email" });
+        .status(401)
+        .json({ msg: "User blocked/ need to verify your email" });
       }
       let newAccessToken = createToken(user._id, user.role);
-      const result = await user.save();
       return res.json({ token: newAccessToken, user });
     } catch (err) {
       return res.status(500).json({ msg: "There was an error signing" });
