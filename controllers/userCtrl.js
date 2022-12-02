@@ -250,7 +250,7 @@ exports.userCtrl = {
     if (banner) {
       try {
         let user = await UserModel.findOne({ _id: req.tokenData._id })
-        user.cover_img = req.body.banner;
+        user.cover_img = req.body;
         await user.save()
         res.status(200).json({ msg: "banner has been changed" })
       }
