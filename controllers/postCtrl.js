@@ -183,12 +183,12 @@ exports.postCtrl = {
     },
     likePost: async (req, res) => {
         try {
-            let { fullName } = await UserModel.findOne({ _id: req.tokenData._id });
+            let user = await UserModel.findOne({ _id: req.tokenData._id });
             //creating an object from the user 
-            let user = {
-                user_id: req.tokenData._id,
-                profile: "https://cdn-icons-png.flaticon.com/128/1077/1077114.png",
-                fullName
+            let userInfo = {
+                user_id: user._id,
+                profile_img: user.profile_img.url,
+                fullName: user.fullName
             }
             let postID = req.params.postID;
             let post = await PostModel.findOne({ _id: postID });
@@ -196,7 +196,7 @@ exports.postCtrl = {
             // if the user found in the array setup found true else false
             const found = post.likes.some(el => el.user_id === req.tokenData._id);
             if (!found) {
-                post.likes.push(user);
+                post.likes.unshift(userInfo);
                 await post.save()
                 return res.status(201).json({ posts: post.likes, msg: "You like the post" })
             }

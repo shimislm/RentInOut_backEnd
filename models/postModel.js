@@ -4,7 +4,7 @@ const cloudinary = {url:String, img_id:String}
 // helper object for likes
 const likesObject = {
     user_id: String,
-    profile: String,
+    profile_img: String,
     fullName: {
         firstName: String,
         lastName: String
