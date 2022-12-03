@@ -29,7 +29,7 @@ router.post("/clientEmail", mailMe.sendEmail)
 // user routes
 
 router.get("/userList", authAdmin, userCtrl.getUsersList)
-router.get("/userSearch", auth, userCtrl.userSearch)
+router.get("/userSearch", userCtrl.userSearch)
 router.get("/countUsers", authAdmin, userCtrl.countUsers)
 router.get('/info/:id', userCtrl.infoById)
 router.get('/getRank/:userID', userCtrl.avgRank)
