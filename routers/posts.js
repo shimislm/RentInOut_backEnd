@@ -11,7 +11,7 @@ router.delete("/:postID", auth, postCtrl.delete);
 
 // CRUD done
 
-router.get("/count", authAdmin, postCtrl.countAll);
+router.get("/count",  postCtrl.countAll);
 router.get("/search", postCtrl.search);
 router.get("/checkLikes/:postID",postCtrl.countLikes);
 router.get("/topThreeLikes/:postID",postCtrl.topThreeLikes);
