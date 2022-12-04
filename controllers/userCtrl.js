@@ -11,7 +11,7 @@ exports.userCtrl = {
     console.log(req.body)
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({$and:[{_id: { $ne: config.superID }} ,{ _id: id }]}, { password: 0 , role:0 });
+      let userInfo = await UserModel.findOne({ _id: id } , { password: 0 });
       if(!userInfo){
         return res.status(404).json({ message: "User not found" });
       }

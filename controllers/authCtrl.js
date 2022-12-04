@@ -164,7 +164,7 @@ exports.authCtrl = {
           // checking if link expired
           let reset = await PasswordReset.deleteOne({ userId });
           if (!reset) {
-            res.status(401).json({ msg: "Password reset link as expired", err });
+            return res.status(401).json({ msg: "Password reset link as expired", err });
           }
         } else {
           //compare reset string with string from db
@@ -187,22 +187,22 @@ exports.authCtrl = {
                 // update completed
                 let reset = await PasswordReset.deleteOne({ userId });
                 if (reset) {
-                  res.status(200).json({status: "Success", msg: "Password reset successfully"});
+                  return res.status(200).json({status: "Success", msg: "Password reset successfully"});
                 } else {
-                  res.status(401).json({ msg: "Failed to update user password", error });
+                  return res.status(401).json({ msg: "Failed to update user password", error });
                 }
               }
             }
           } else {
-            res.status(401).json({ msg: "Invalid password details" });
+            return res.status(401).json({ msg: "Invalid password details" });
           }
         }
       } else {
         // password reset request not found
-        res.status(401).json({ msg: "Password reset request not found" });
+        return res.status(401).json({ msg: "Password reset request not found" });
       }
     } catch (error) {
-      res.status(500).json({ msg: "Checking for existing password recors failed", err });
+      return res.status(500).json({ msg: "Checking for existing password recors failed", err });
     }
   },
   // Gmail controllers
