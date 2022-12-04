@@ -1,6 +1,10 @@
 const Joi = require("joi");
 
 exports.validatePost = (_reqBody) => {
+  let cloudinary = Joi.object().keys({
+    url: Joi.string().required(),
+    img_id: Joi.string().required()
+  })
   let joiSchema = Joi.object({
     title : Joi.string().min(2).max(50).required(),
     info : Joi.string().min(2).max(1500).required(),
@@ -10,7 +14,8 @@ exports.validatePost = (_reqBody) => {
     available_from : Joi.date().min(2).max(50).allow(null,""),
     country : Joi.string().min(2).max(50).required(),
     city: Joi.string().min(2).max(50).required(),
-    category_url : Joi.string().min(2).max(50).required()
+    category_url : Joi.string().min(2).max(50).required(),
+    img : Joi.array().items(cloudinary)
   });
   return joiSchema.validate(_reqBody);
 };
