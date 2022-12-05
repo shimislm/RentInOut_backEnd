@@ -16,7 +16,7 @@ router.get("/search", postCtrl.search);
 router.get("/checkLikes/:postID",postCtrl.countLikes);
 router.get("/topThreeLikes/:postID",postCtrl.topThreeLikes);
 router.get("/countMyPosts", auth, postCtrl.countMyPosts);
-router.get("/userPosts", auth ,postCtrl.userPosts);
+router.get("/userPosts/:userID", auth ,postCtrl.userPosts);
 router.post("/likePost/:postID",auth,  postCtrl.likePost)
 router.patch("/changeRange/:postID", auth, postCtrl.changeRange);
 router.patch("/changeActive/:postID", authAdmin, postCtrl.changeActive);
