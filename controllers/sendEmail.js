@@ -15,7 +15,7 @@ let transporter = nodemailer.createTransport({
 let mailOptions = (_email , _subject , _html) => {
     const mailOptions = {
       from: _email,
-      to: _email,
+      to: config.gmailUser,
       subject: _subject,
       html: _html
     };
@@ -26,7 +26,7 @@ exports.mailMe = {
         console.log(req.body)
         let subject = "mail send from " + req.body.phone;
         let htmlMessage = `<div color:danger> <h2>${req.body.firstName} - ${req.body.lastName}</h2> <span>${req.body.phone}</span> | <span>${req.body.email}</span> <p>${req.body.textarea}</p> </div>`
-        const email = mailOptions("ido12301f@gmail.com", subject, htmlMessage)
+        const email = mailOptions(req.body.email, subject, htmlMessage)
         try {
             transporter.sendMail(email, (err, info) => {
                 res.json({
