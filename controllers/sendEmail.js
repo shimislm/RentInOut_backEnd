@@ -14,7 +14,7 @@ let transporter = nodemailer.createTransport({
 
 let mailOptions = (_email , _subject , _html) => {
     const mailOptions = {
-      from: _email,
+      from: config.gmailUser,
       to: config.gmailUser,
       subject: _subject,
       html: _html
