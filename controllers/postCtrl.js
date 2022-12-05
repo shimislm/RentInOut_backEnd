@@ -141,8 +141,9 @@ exports.postCtrl = {
         let sort = req.query.sort || "createdAt";
         let reverse = req.query.reverse == "yes" ? -1 : 1
         try {
+            let id  = req.params.userID
             let posts = await PostModel
-                .find({ creator_id: req.tokenData._id })
+                .find({ creator_id: id })
                 .limit(perPage)
                 .skip((page - 1) * perPage)
                 .sort({ [sort]: reverse })
