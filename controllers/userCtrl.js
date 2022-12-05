@@ -241,8 +241,8 @@ exports.userCtrl = {
       type: 'upload'
     }
     cloudinary.uploader.destroy(id, details, (error, result) => {
-      if (error) return res.json(error )
-      return res.json( result )
+      if (error) return res.json({ error })
+      return res.json({ result })
     });
   },
   bannerImgDelete: async (req, res) => {
