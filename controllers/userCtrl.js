@@ -2,6 +2,7 @@
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
+const cloudinary = require('cloudinary').v2;
 
 exports.userCtrl = {
   checkToken: async (req, res) => {
@@ -11,8 +12,8 @@ exports.userCtrl = {
     console.log(req.body)
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({ _id: id } , { password: 0 });
-      if(!userInfo){
+      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
       return res.json({ userInfo });
@@ -184,11 +185,11 @@ exports.userCtrl = {
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
-      let users = await UserModel.find({ $and: [{ _id:{ $ne: config.superID }}, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] },{ password: 0 })
+      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } }, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] }, { password: 0 })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-        return res.json(users);
+      return res.json(users);
     }
     catch (err) {
       console.log(err);
@@ -231,5 +232,31 @@ exports.userCtrl = {
       res.status(404).json({ err: "Must send an banner" })
     }
   },
-  
+  profileImgDelete: async (req, res) => {
+    let id = req.query.id;
+    let details = {
+      cloud_name: config.cloudinary_profile_name,
+      api_key: config.cloudinary_profile_key,
+      api_secret: config.cloudinary_profile_secret,
+      type: 'upload'
+    }
+    cloudinary.uploader.destroy(id, details, (error, result) => {
+      if (error) return res.json({ error })
+      return res.json({ result })
+    });
+  },
+  bannerImgDelete: async (req, res) => {
+    let id = req.query.id;
+    let details = {
+      cloud_name: config.cloudinary_banner_name,
+      api_key: config.cloudinary_banner_key,
+      api_secret: config.cloudinary_banner_secret,
+      type: 'upload'
+    }
+    cloudinary.uploader.destroy(id, details, (error, result) => {
+      if (error) return res.json({ error })
+      return res.json({ result })
+    });
+  }
+
 };

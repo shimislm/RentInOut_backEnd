@@ -12,5 +12,10 @@ exports.config = {
     gmailPass: process.env.AUTH_PASS,
     google_client_id: process.env.GOOGLE_CLIENT_ID,
     google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
-
+    cloudinary_profile_name : process.env.CLODINARY_PROFILE_NAME,
+    cloudinary_profile_key : process.env.CLODINARY_PROFILE_KEY,
+    cloudinary_profile_secret : process.env.CLODINARY_PROFILE_SECRET,
+    cloudinary_banner_name : process.env.CLODINARY_BANNER_NAME,
+    cloudinary_banner_key : process.env.CLODINARY_BANNER_KEY,
+    cloudinary_banner_secret : process.env.CLODINARY_BANNER_SECRET,
   }

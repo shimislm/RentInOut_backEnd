@@ -40,6 +40,9 @@ router.patch("/changeActive/:userID", authAdmin, userCtrl.changeActive)
 router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
 router.patch("/uploadProfile", auth, userCtrl.uploadImg)
 router.patch("/uploadBanner", auth, userCtrl.uploadBanner)
+// delete from cloudinary
+router.post("/cloudinary/profileDel", auth, userCtrl.profileImgDelete)
+router.post("/cloudinary/bannerDel", auth, userCtrl.bannerImgDelete)
 
 
 
