@@ -141,7 +141,8 @@ exports.postCtrl = {
         let sort = req.query.sort || "createdAt";
         let reverse = req.query.reverse == "yes" ? -1 : 1
         try {
-            let id  = req.params.userID
+            let id  = req.params.userID;
+            console.log(id)
             let posts = await PostModel
                 .find({ creator_id: id })
                 .limit(perPage)
