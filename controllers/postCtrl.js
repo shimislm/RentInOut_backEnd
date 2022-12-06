@@ -198,11 +198,15 @@ exports.postCtrl = {
             // if the user found in the array setup found true else false
             const found = post.likes.some(el => el.user_id === req.tokenData._id);
             if (!found) {
+                user.wishList.push({post, post_id: post._id })
+                await user.save()
                 post.likes.unshift(userInfo);
                 await post.save()
                 return res.status(201).json({ posts: post.likes, msg: "You like the post" })
             }
             // remove from post like the user.
+            user.wishList= user.wishList.filter((e)=> e.post_id === postID )
+            await user.save()
             post.likes = post.likes.filter((e) => e.user_id != req.tokenData._id)
             await post.save()
             res.status(201).json({ posts: post.likes, msg: "unlike the post" })
