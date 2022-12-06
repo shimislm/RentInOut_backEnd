@@ -194,19 +194,26 @@ exports.postCtrl = {
             }
             let postID = req.params.postID;
             let post = await PostModel.findOne({ _id: postID });
+            const inWishlist = user.wishList.some((el) => String(el.post_id) === postID)
+            if(!inWishlist){
+                console.log(1)
+                user.wishList.unshift({post, post_id: post._id})
+                await user.save()               
+            }
+            else{
+                console.log(2)
+                user.wishList= user.wishList.filter((el)=> String(el.post_id) !== postID )
+                await user.save()
+            }
             //need to check if the user already 
             // if the user found in the array setup found true else false
             const found = post.likes.some(el => el.user_id === req.tokenData._id);
             if (!found) {
-                user.wishList.push({post, post_id: post._id })
-                await user.save()
                 post.likes.unshift(userInfo);
                 await post.save()
                 return res.status(201).json({ posts: post.likes, msg: "You like the post" })
             }
             // remove from post like the user.
-            user.wishList= user.wishList.filter((e)=> e.post_id === postID )
-            await user.save()
             post.likes = post.likes.filter((e) => e.user_id != req.tokenData._id)
             await post.save()
             res.status(201).json({ posts: post.likes, msg: "unlike the post" })

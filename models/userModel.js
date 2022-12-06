@@ -48,8 +48,8 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   wishList: {
-    type: Array({}),
-    default: [{}],
+    type: Array(),
+    default: [],
   },
   createdAt: {
     type: Date,
