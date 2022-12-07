@@ -28,9 +28,10 @@ exports.userCtrl = {
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
+      let newAccessToken = await createToken(user._id, user.role);
+      localStorage.setItem("token" , newAccessToken)
       return res.json({ userInfo });
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ msg: "err", err });
     }
   },
