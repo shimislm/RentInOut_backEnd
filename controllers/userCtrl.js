@@ -9,7 +9,19 @@ exports.userCtrl = {
     res.json(req.tokenData);
   },
   infoById: async (req, res) => {
-    console.log(req.body)
+    try {
+      let id = req.params.id;
+      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      if (!userInfo) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.json({ userInfo });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "err", err });
+    }
+  },
+  infoByIdWithToken: async (req, res) => {
     try {
       let id = req.params.id;
       let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
