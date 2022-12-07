@@ -2,6 +2,7 @@
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
+const { createToken } = require("../helpers/userHelper");
 const cloudinary = require('cloudinary').v2;
 
 exports.userCtrl = {
@@ -25,12 +26,12 @@ exports.userCtrl = {
     try {
       let id = req.params.id;
       let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      console.log(userInfo);
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
-      let newAccessToken = await createToken(user._id, user.role);
-      localStorage.setItem("token" , newAccessToken)
-      return res.json({ userInfo });
+      let newAccessToken = await createToken(userInfo._id , userInfo.role);
+      return res.json({ userInfo , newAccessToken });
     } catch (err) {
       return res.status(500).json({ msg: "err", err });
     }
