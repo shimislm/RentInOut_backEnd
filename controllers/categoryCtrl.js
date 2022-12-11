@@ -39,7 +39,7 @@ exports.categoryCtrl = {
         res.json(category);
     }
     catch (err) {
-        res.status(500).json({ err: err });
+        res.status(500).json({ message: err });
     }
 },
 
@@ -74,12 +74,12 @@ exports.categoryCtrl = {
     }
     try {
       let idEdit = req.params.idEdit;
-      let data = await CategoryModel.updateOne({ _id: idEdit }, req.body);
+      await CategoryModel.updateOne({ _id: idEdit }, req.body);
       let category = await CategoryModel.findOne({ _id: idEdit });
       category.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       category.editor_id = req.tokenData._id;
       category.save();
-      res.json(data);
+      res.json({category});
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });

@@ -2,6 +2,7 @@
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
+const { createToken } = require("../helpers/userHelper");
 const cloudinary = require('cloudinary').v2;
 
 exports.userCtrl = {
@@ -9,7 +10,6 @@ exports.userCtrl = {
     res.json(req.tokenData);
   },
   infoById: async (req, res) => {
-    console.log(req.body)
     try {
       let id = req.params.id;
       let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
@@ -19,6 +19,20 @@ exports.userCtrl = {
       return res.json({ userInfo });
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ msg: "err", err });
+    }
+  },
+  infoByIdWithToken: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      console.log(userInfo);
+      if (!userInfo) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      let newAccessToken = await createToken(userInfo._id , userInfo.role);
+      return res.json({ userInfo , newAccessToken });
+    } catch (err) {
       return res.status(500).json({ msg: "err", err });
     }
   },
