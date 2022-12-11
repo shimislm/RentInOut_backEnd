@@ -8,13 +8,13 @@ exports.postCtrl = {
   getAll: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
-    let sort = req.query.sort || "createdAt";
+    let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let posts = await PostModel.find({})
+        .sort({ [sort]: reverse })
         .limit(perPage)
-        .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
+        .skip((page - 1) * perPage);
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -100,7 +100,7 @@ exports.postCtrl = {
   search: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
-    let sort = req.query.sort || "createdAt";
+    let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let searchQ = req.query?.s;
@@ -142,7 +142,7 @@ exports.postCtrl = {
   userPosts: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
-    let sort = req.query.sort || "createdAt";
+    let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let id = req.params.userID;
