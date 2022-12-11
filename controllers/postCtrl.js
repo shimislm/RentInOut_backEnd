@@ -15,7 +15,7 @@ exports.postCtrl = {
                 .find({})
                 .limit(perPage)
                 .skip((page - 1) * perPage)
-                .sort({ [sort]: reverse })
+                .sort({[sort]: reverse })
             res.json(posts);
         }
         catch (err) {
@@ -49,7 +49,7 @@ exports.postCtrl = {
             }
             if (data.modifiedCount === 1) {
                 let post = await PostModel.findOne({ _id: postID })
-                post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+                post.updatedAt = Math.round((new Date()).getTime() / 1000)
                 await post.save()
                 return res.status(200).json({ data, msg: "post edited" });
             }
@@ -127,7 +127,7 @@ exports.postCtrl = {
             }
             let post = await PostModel.findOne({ _id: postID })
             post.active= !post.active;
-            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.updatedAt = Math.round((new Date()).getTime() / 1000)
             post.save()
 
             return res.json(post);
@@ -176,7 +176,7 @@ exports.postCtrl = {
             }
             //update the change time 
             let post = await PostModel.findOne({ _id: postID })
-            post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000)
+            post.updatedAt = Math.round((new Date()).getTime() / 1000)
             post.save()
             return res.json(data);
         } catch (err) {
