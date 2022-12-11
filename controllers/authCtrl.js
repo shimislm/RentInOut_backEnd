@@ -17,7 +17,7 @@ exports.authCtrl = {
   signUp: async (req, res) => {
     let validBody = validateUser(req.body);
     if (validBody.error) {
-      return res.status(400).json({ Messege: "User information is invalid" });
+      return res.status(400).json({ Messege: validBody.error.details });
     }
     try {
       let user = new UserModel(req.body);
