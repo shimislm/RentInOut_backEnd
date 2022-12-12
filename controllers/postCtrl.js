@@ -142,7 +142,7 @@ exports.postCtrl = {
   userPosts: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
-    let sort = req.query.sort || "_id";
+    let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let id = req.params.userID;
@@ -213,7 +213,7 @@ exports.postCtrl = {
         const inWishlist = user.wishList.some(
           (el) => String(el._id) === postID
         );
-        if (!inWishlist && !user._id === req.tokenData._id ) {
+        if (!inWishlist && String(post.creator_id) != req.tokenData._id) {
           user.wishList.unshift(post);
           await user.save();
         }
