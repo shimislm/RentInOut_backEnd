@@ -43,7 +43,7 @@ const postSchema = new mongoose.Schema({
     },
     available_from: {
         type: Date,
-        default: new Date(Date.now() +2 * 60 * 60 * 1000)
+        default: Date.now
     },
     country: String,
     city: String,
@@ -54,11 +54,11 @@ const postSchema = new mongoose.Schema({
     },
     createdAt :{
         type: Number,
-        default: Math.round((new Date()).getTime() / 1000)
+        default: Date.now
     },
     updatedAt :{
         type: Number,
-        default: Math.round((new Date()).getTime() / 1000)
+        default: Date.now
     }
 });
 

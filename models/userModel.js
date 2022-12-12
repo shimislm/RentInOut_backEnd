@@ -52,12 +52,12 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   createdAt: {
-    type: Date,
-    default: new Date(Date.now() + 2 * 60 * 60 * 1000),
+    type: Number,
+    default: Date.now,
   },
   updatedAt: {
-    type: Date,
-    default: new Date(Date.now() + 2 * 60 * 60 * 1000),
+    type: Number,
+    default: Date.now,
   },
 });
 
