@@ -213,7 +213,7 @@ exports.postCtrl = {
         const inWishlist = user.wishList.some(
           (el) => String(el._id) === postID
         );
-        if (!inWishlist) {
+        if (!inWishlist && !user._id === req.tokenData._id ) {
           user.wishList.unshift(post);
           await user.save();
         }
