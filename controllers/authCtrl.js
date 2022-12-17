@@ -129,7 +129,6 @@ exports.authCtrl = {
     }catch (error) {
       // user verification record not found in DB
         let delVer = await UserVerificationModel.deleteOne({ uniqueString })
-        let delUser = await UserModel.deleteOne({ _id: userId })
         let message ="an error occurre while checking for existing user Verification record ";
         res.redirect(`/users/verified/?error=true&message=${message}`);
       };

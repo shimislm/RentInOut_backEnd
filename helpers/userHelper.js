@@ -38,6 +38,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
     // console.log("email " + email)
     // console.log("id " + _id)
     const uniqueString = uuidv4() + _id;
+    console.log(uniqueString , " " , _id)
     const html =`<p>Verify Your Email </p><p> click <a href=${config.domain+"/users/verify/"+_id+"/"+uniqueString}> here</a></p>`
     
     // creat an unique string
