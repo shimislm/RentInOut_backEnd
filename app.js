@@ -8,6 +8,7 @@ const passport = require("passport");
 const session = require("express-session");
 const fileUpload = require("express-fileupload");
 const { routesInit } = require("./routers/config_routes");
+const {sockets} = require( "./routers/socket");
 require("dotenv").config()
 require("./db/mongoconnect");
 
@@ -39,23 +40,5 @@ let port = process.env.PORT || 3001
 server.listen(port , ()=>{
     console.log(`Server is running on port: ${port}`)
 });
-io.on('connection', (socket)=>{
-    socket.on("send-messege",({message , roomID})=>{
-        console.log(roomID)
-        socket.to(roomID).emit('messege-back', {message});
-    })
-    socket.on("typing-start",({roomID})=>{
-        socket.to(roomID).emit("recieve-typing");
-    })
-    socket.on("typing-end",({roomID})=>{
-        socket.to(roomID).emit("notRecieve-typing");
-    })
-    socket.on("join-room",({roomID})=>{
-        console.log("joining room " + roomID)
-        socket.join(roomID);
-    })
-    socket.on('disconnect', (socket)=>{
-        console.log("Disconnect")
-    })
-})
+io.on('connection', sockets)
 
