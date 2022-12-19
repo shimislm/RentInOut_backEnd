@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type: Array(),
     default: [],
   },
+  messages: {
+    type: [mongoose.ObjectId],
+    default: []
+  },
   createdAt: {
     type: Number,
     default: Date.now,
