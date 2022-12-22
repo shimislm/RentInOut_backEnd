@@ -57,7 +57,7 @@ exports.socketCtrl = {
       path: "messages",
     });
     try {
-      let messages = message.messages
+      let messages = message.messages;
       return res.status(200).json(messages);
     } catch (err) {
       console.log(err);
