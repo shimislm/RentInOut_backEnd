@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const messageObj ={
     sender: String,
+    img: String,
     userName:String,
     message: String
 }
