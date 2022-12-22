@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const messageObj =({
+const messageObj ={
     sender: String,
     userName:String,
     message: String
-})
+}
 
 const messageSchema = new mongoose.Schema({
     name: String,
