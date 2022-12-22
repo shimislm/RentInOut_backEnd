@@ -12,6 +12,6 @@ const messageSchema = new mongoose.Schema({
     roomID: String,
     creatorID: String,
     messagesArr:[messageObj]
-} , {timeStamp: true})
+} , { timestamps: true })
 
 exports.MessageModel = mongoose.model("messages", messageSchema);
