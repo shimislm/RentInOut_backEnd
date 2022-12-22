@@ -13,14 +13,15 @@ exports.socketCtrl = {
       ) {
         let newMessage = new MessageModel(req.body.messageObj);
         newMessage.save();
-        await UserModel.updateOne(
+        let user = await UserModel.updateOne(
           { _id: req.body.userID },
           { $push: { messages: newMessage._id } }
         );
-        await UserModel.updateOne(
+        let creator = await UserModel.updateOne(
           { _id: req.body.creatorID },
           { $push: { messages: newMessage._id } }
         );
+        return res.status(200).json({user, creator});
       } else {
         // console.log(req.body.messageObj.messages)
         let message = await MessageModel.findOneAndUpdate(
