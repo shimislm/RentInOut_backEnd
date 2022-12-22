@@ -62,8 +62,8 @@ exports.socketCtrl = {
         let keyA = new Date(a.updatedAt),
           keyB = new Date(b.updatedAt);
         // Compare the 2 dates
-        if (keyA < keyB) return -1;
-        if (keyA > keyB) return 1;
+        if (keyA > keyB) return -1;
+        if (keyA < keyB) return 1;
         return 0;
       });
       return res.status(200).json(messages);
