@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 const messageObj ={
     sender: String,
@@ -11,6 +12,6 @@ const messageSchema = new mongoose.Schema({
     roomID: String,
     creatorID: String,
     messagesArr:[messageObj]
-})
+} , {timeStamp: true})
 
 exports.MessageModel = mongoose.model("messages", messageSchema);
