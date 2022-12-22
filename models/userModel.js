@@ -52,8 +52,8 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   messages: {
-    type: [mongoose.ObjectId],
-    default: []
+    type: [mongoose.Types.ObjectId],
+    ref: "messages"
   },
   createdAt: {
     type: Number,

@@ -1,9 +1,8 @@
-const { MessageModel } = require("../models/messageModel");
+
 
 exports.sockets = (socket) => {
-    socket.on("send-messege",({message , roomID , userName})=>{
-        console.log(userName)
-        socket.to(roomID).emit('messege-back', {message , userName});
+    socket.on("send-messege",({message , roomID , userName , sender})=>{
+        socket.to(roomID).emit('messege-back', {message , userName , sender});
     })
     socket.on("typing-start",({roomID})=>{
         socket.to(roomID).emit("recieve-typing");
@@ -14,10 +13,9 @@ exports.sockets = (socket) => {
     socket.on("join-room",({roomID})=>{
         socket.join(roomID);
     })
-    socket.on('disconnect', ({roomID , userId})=>{
-        let chatMessage = MessageModel.findOne({id:roomID})
-        if(chatMessage){
-            
-        }
+    socket.on('disconnect', ({messageObj , userID})=>{
+        // let user = await UserModel.findById(userId).populate({path:'messages', model: "message"});
+        // console.log(user);
+        // let user = await UserModel.updateOne({_id: userID}).populate({path:'messages', $push: "message"});
     })
 }

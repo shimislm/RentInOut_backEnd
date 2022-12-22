@@ -1,9 +1,9 @@
-
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
 const { createToken } = require("../helpers/userHelper");
-const cloudinary = require('cloudinary').v2;
+const { MessageModel, MessageObjModel } = require("../models/messageModel");
+const cloudinary = require("cloudinary").v2;
 
 exports.userCtrl = {
   checkToken: async (req, res) => {
@@ -30,8 +30,8 @@ exports.userCtrl = {
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
-      let newAccessToken = await createToken(userInfo._id , userInfo.role);
-      return res.json({ userInfo , newAccessToken });
+      let newAccessToken = await createToken(userInfo._id, userInfo.role);
+      return res.json({ userInfo, newAccessToken });
     } catch (err) {
       return res.status(500).json({ msg: "err", err });
     }
@@ -42,7 +42,10 @@ exports.userCtrl = {
     let sort = req.query.sort || "role";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await UserModel.find({ _id: { $ne: config.superID } }, { password: 0 })
+      let data = await UserModel.find(
+        { _id: { $ne: config.superID } },
+        { password: 0 }
+      )
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
@@ -136,12 +139,13 @@ exports.userCtrl = {
       }
       if (req.tokenData.role === "admin") {
         user = await UserModel.updateOne({ _id: idEdit }, req.body);
-      }
-      else if (idEdit != req.tokenData._id) {
-        res.sendStatus(401)
-      }
-      else {
-        user = await UserModel.updateOne({ _id: idEdit, _id: req.tokenData._id }, req.body);
+      } else if (idEdit != req.tokenData._id) {
+        res.sendStatus(401);
+      } else {
+        user = await UserModel.updateOne(
+          { _id: idEdit, _id: req.tokenData._id },
+          req.body
+        );
       }
       // else{ throw new Error}
       return res.status(200).json(user);
@@ -199,13 +203,27 @@ exports.userCtrl = {
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
-      let users = await UserModel.find({ $and: [{ _id: { $ne: config.superID } }, { $or: [{ "fullName.firstName": searchReg }, { "fullName.lastName": searchReg }, { email: searchReg }, { phone: searchReg }] }] }, { password: 0 })
+      let users = await UserModel.find(
+        {
+          $and: [
+            { _id: { $ne: config.superID } },
+            {
+              $or: [
+                { "fullName.firstName": searchReg },
+                { "fullName.lastName": searchReg },
+                { email: searchReg },
+                { phone: searchReg },
+              ],
+            },
+          ],
+        },
+        { password: 0 }
+      )
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
       return res.json(users);
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
       res.status(500).json({ err: err });
     }
@@ -215,35 +233,31 @@ exports.userCtrl = {
 
     if (image) {
       try {
-        let user = await UserModel.findOne({ _id: req.tokenData._id })
+        let user = await UserModel.findOne({ _id: req.tokenData._id });
         user.profile_img = req.body;
-        await user.save()
-        res.status(200).json({ msg: "profile has been changed" })
+        await user.save();
+        res.status(200).json({ msg: "profile has been changed" });
+      } catch (err) {
+        res.status(500).json({ err });
       }
-      catch (err) {
-        res.status(500).json({ err })
-      }
-    }
-    else {
-      res.status(404).json({ err: "Must send an image" })
+    } else {
+      res.status(404).json({ err: "Must send an image" });
     }
   },
   uploadBanner: async (req, res) => {
     let banner = req.body;
-    console.log(banner)
+    console.log(banner);
     if (banner) {
       try {
-        let user = await UserModel.findOne({ _id: req.tokenData._id })
+        let user = await UserModel.findOne({ _id: req.tokenData._id });
         user.cover_img = req.body;
-        await user.save()
-        res.status(200).json({ msg: "banner has been changed" })
+        await user.save();
+        res.status(200).json({ msg: "banner has been changed" });
+      } catch (err) {
+        res.status(500).json({ err });
       }
-      catch (err) {
-        res.status(500).json({ err })
-      }
-    }
-    else {
-      res.status(404).json({ err: "Must send an banner" })
+    } else {
+      res.status(404).json({ err: "Must send an banner" });
     }
   },
   profileImgDelete: async (req, res) => {
@@ -252,11 +266,11 @@ exports.userCtrl = {
       cloud_name: config.cloudinary_profile_name,
       api_key: config.cloudinary_profile_key,
       api_secret: config.cloudinary_profile_secret,
-      type: 'upload'
-    }
+      type: "upload",
+    };
     cloudinary.uploader.destroy(id, details, (error, result) => {
-      if (error) return res.json({ error })
-      return res.json({ result })
+      if (error) return res.json({ error });
+      return res.json({ result });
     });
   },
   bannerImgDelete: async (req, res) => {
@@ -265,12 +279,12 @@ exports.userCtrl = {
       cloud_name: config.cloudinary_banner_name,
       api_key: config.cloudinary_banner_key,
       api_secret: config.cloudinary_banner_secret,
-      type: 'upload'
-    }
+      type: "upload",
+    };
     cloudinary.uploader.destroy(id, details, (error, result) => {
-      if (error) return res.json({ error })
-      return res.json({ result })
+      if (error) return res.json({ error });
+      return res.json({ result });
     });
-  }
+  },
 
 };

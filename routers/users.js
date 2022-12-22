@@ -5,6 +5,7 @@ const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
 const passport = require("passport");
 const { mailMe } = require("../controllers/sendEmail");
+const { socketCtrl } = require("../controllers/socketCtrl");
 const seccessLoginUrl = "http://localhost:3000/checkGmail"
 
 //google signIn
@@ -41,9 +42,13 @@ router.patch("/changeActive/:userID", authAdmin, userCtrl.changeActive)
 router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
 router.patch("/uploadProfile", auth, userCtrl.uploadImg)
 router.patch("/uploadBanner", auth, userCtrl.uploadBanner)
+router.patch("/chatUpdate", auth, socketCtrl.chatUpdate)
+router.get("/getChat/:roomID", auth, socketCtrl.getChatByRoomID)
+router.get("/getAllChat", auth, socketCtrl.getUserChats)
 // delete from cloudinary
 router.post("/cloudinary/profileDel", auth, userCtrl.profileImgDelete)
 router.post("/cloudinary/bannerDel", auth, userCtrl.bannerImgDelete)
+
 
 
 

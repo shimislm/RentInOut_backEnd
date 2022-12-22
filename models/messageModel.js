@@ -1,16 +1,15 @@
 const mongoose = require("mongoose");
+const messageObj =({
+    sender: String,
+    userName:String,
+    message: String
+})
+
 const messageSchema = new mongoose.Schema({
     name: String,
     roomID: String,
-    owner:{
-        owner_id: String,
-        fullName: String
-    },
-    user: {
-        user_id: String,
-        fullName: String
-    },
-    messages: [],
+    creatorID: String,
+    messagesArr:[messageObj]
 })
 
-exports.MessageModel = mongoose.model("message", messageSchema);
+exports.MessageModel = mongoose.model("messages", messageSchema);
