@@ -26,8 +26,9 @@ exports.socketCtrl = {
         // console.log(req.body.messageObj.messages)
         let message = await MessageModel.findOneAndUpdate(
           { roomID: req.body.messageObj.roomID },
-          { messagesArr: req.body.messageObj.messages }
+          { messagesArr: req.body.messageObj.messagesArr }
         );
+        console.log(req.body.messageObj.messagesArr)
         message.save();
       }
       return res.status(200).json(message);
