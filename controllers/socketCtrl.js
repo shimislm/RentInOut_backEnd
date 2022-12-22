@@ -29,6 +29,7 @@ exports.socketCtrl = {
         );
         message.save();
       }
+      return res.status(200).json(message);
     } catch (err) {
       console.log(err);
       res.status(500).json({ err: err });
