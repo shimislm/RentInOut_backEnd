@@ -57,7 +57,14 @@ exports.socketCtrl = {
       path: "messages",
     });
     try {
-      let messages = message.messages;
+      let messages = message.messages.sort(function(a, b) {
+        var keyA = new Date(a.updatedAt),
+          keyB = new Date(b.updatedAt);
+        // Compare the 2 dates
+        if (keyA > keyB) return -1;
+        if (keyA < keyB) return 1;
+        return 0;
+      });
       return res.status(200).json(messages);
     } catch (err) {
       console.log(err);
