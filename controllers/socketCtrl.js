@@ -29,7 +29,6 @@ exports.socketCtrl = {
           { roomID: req.body.messageObj.roomID },
           { messagesArr: req.body.messageObj.messagesArr }
         );
-        console.log(req.body.messageObj.messagesArr)
         message.save();
       }
       return res.status(200).json(message);
@@ -48,7 +47,6 @@ exports.socketCtrl = {
         let messages = message.messages.filter((msg) => msg.roomID === roomID);
         return res.status(200).json(messages);
       } catch (err) {
-        console.log(err);
         res.status(500).json({ err: err });
       }
     } else return res.status(404).json({ msg: "Chat not found" });
@@ -68,8 +66,24 @@ exports.socketCtrl = {
       });
       return res.status(200).json(messages);
     } catch (err) {
-      console.log(err);
       res.status(500).json({ err: err });
     }
   },
+  deleteMessage: async (req, res) => {
+    
+  },
+  deleteChat: async (req, res) => {
+    try{
+      let chat = await MessageModel.deleteOne(req.params.chatID)
+      let owner = await UserModel.findById(chat.creatorID)
+      owner.messages = owner.messages.filter(msg => msg._id !== req.params.chatID)
+      await owner.save()
+      let user = await UserModel.findById(req.tokenData._id)
+      user.messages = user.messages.filter(msg => msg._id !== req.params.chatID)
+      await user.save()
+      return res.sendStatus(200)
+    } catch (err) {
+      res.status(500).json({ err: err });
+    }
+  }
 };
