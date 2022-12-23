@@ -7,8 +7,10 @@ const messageObj ={
 }
 
 const messageSchema = new mongoose.Schema({
-    name: String,
-    img: String,
+    ownerName: String,
+    ownerImg: String,
+    userName: String,
+    userImg: String,
     roomID: String,
     creatorID: String,
     messagesArr:[messageObj]
