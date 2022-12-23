@@ -4,11 +4,6 @@ const { UserModel } = require("../models/userModel");
 
 exports.socketCtrl = {
   chatUpdate: async (req, res) => {
-    if (userID == config.superID) {
-        return res
-          .status(401)
-          .json({ msg: "Super admin can't chat" });
-      }
     let message = await UserModel.findOne({ _id: req.body.userID }).populate({
       path: "messages",
       select: "roomID",
