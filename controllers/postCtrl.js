@@ -25,11 +25,6 @@ exports.postCtrl = {
     if (validBody.error) {
       return res.status(400).json(validBody.error.details);
     }
-    if (userID == config.superID) {
-      return res
-        .status(401)
-        .json({ msg: "Super admin can't create posts" });
-    }
     try {
       let post = new PostModel(req.body);
       post.creator_id = req.tokenData._id;
@@ -198,11 +193,6 @@ exports.postCtrl = {
     }
   },
   likePost: async (req, res) => {
-    if (userID == config.superID) {
-      return res
-        .status(401)
-        .json({ msg: "Super admin can't like posts" });
-    }
     try {
       let user = await UserModel.findOne({ _id: req.tokenData._id });
       //creating an object from the user
@@ -224,7 +214,7 @@ exports.postCtrl = {
           (el) => String(el._id) === postID
         );
         if (!inWishlist && String(post.creator_id) != req.tokenData._id) {
-          user.wishList.unshift(post);
+          user.wishList.unshift(post._id);
           await user.save();
         }
         return res

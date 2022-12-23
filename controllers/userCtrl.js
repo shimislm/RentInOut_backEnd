@@ -286,5 +286,24 @@ exports.userCtrl = {
       return res.json({ result });
     });
   },
+  getUserWishList: async (req, res) => {
+    let user = await UserModel.findOne({ _id: req.tokenData._id }).populate({
+      path: "wishList",
+    });
+    try {
+      let wishList = user.wishList.sort(function(a, b) {
+        var keyA = new Date(a.updatedAt),
+          keyB = new Date(b.updatedAt);
+        // Compare the 2 dates
+        if (keyA > keyB) return -1;
+        if (keyA < keyB) return 1;
+        return 0;
+      });
+      return res.status(200).json(wishList);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ err: err });
+    }
+  },
 
 };

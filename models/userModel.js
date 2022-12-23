@@ -48,8 +48,8 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   wishList: {
-    type: Array(),
-    default: [],
+    type: [mongoose.Types.ObjectId],
+    ref: "posts",
   },
   messages: {
     type: [mongoose.Types.ObjectId],
