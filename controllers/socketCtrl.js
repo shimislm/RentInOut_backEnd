@@ -108,12 +108,20 @@ exports.socketCtrl = {
   },
   deleteChat: async (req, res) => {
     let chatID = req.params.chatID;
+    let chat = await MessageModel.findById(chatID);
     try {
       let user = await UserModel.findById(req.tokenData._id).populate({
         path: "messages",
       });
       user.messages = await user.messages.filter((msg) => msg._id === chatID);
       await user.save();
+      let owner = await UserModel.findById(
+        chat.creatorID).populate({
+        path: "messages",
+      });
+      owner.messages = await owner.messages.filter((msg) => msg._id === chatID);
+      await owner.save();
+      await MessageModel.deleteOne({_id: chatID})
       return res.sendStatus(200);
     } catch (err) {
       res.status(500).json({ err: err });
