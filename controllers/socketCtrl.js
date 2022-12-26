@@ -113,13 +113,13 @@ exports.socketCtrl = {
       let user = await UserModel.findById(chat.userID).populate({
         path: "messages",
       });
-      user.messages = await user.messages.filter((msg) => msg._id === chatID);
+      user.messages = await user.messages.filter((msg) => msg._id !== chatID);
       await user.save();
       let owner = await UserModel.findById(
         chat.creatorID).populate({
         path: "messages",
       });
-      owner.messages = await owner.messages.filter((msg) => msg._id === chatID);
+      owner.messages = await owner.messages.filter((msg) => msg._id !== chatID);
       await owner.save();
       await MessageModel.deleteOne({_id: chatID})
       return res.status(200).json({user , owner});
