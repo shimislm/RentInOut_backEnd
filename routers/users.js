@@ -47,7 +47,7 @@ router.patch("/rankUser/:userID", auth, userCtrl.rankUser)
 router.patch("/uploadProfile", auth, userCtrl.uploadImg)
 router.patch("/uploadBanner", auth, userCtrl.uploadBanner)
 router.patch("/chatUpdate", auth, socketCtrl.chatUpdate)
-router.delete("/deleteMessage/:chatID/:msgID", auth, socketCtrl.deleteMessage) 
+router.delete("/deleteMessage/:roomID/:msgID", auth, socketCtrl.deleteMessage) 
 // delete from cloudinary
 router.post("/cloudinary/profileDel", auth, userCtrl.profileImgDelete)
 router.post("/cloudinary/bannerDel", auth, userCtrl.bannerImgDelete)
