@@ -95,7 +95,7 @@ exports.socketCtrl = {
           );
           await user.save();
           await MessageModel.deleteOne({ _id: chat._id });
-          return res.sendStatus(200);
+          return res.status(200).json({user , owner});
         } catch (err) {
           res.status(500).json({ err: err });
         }
@@ -110,7 +110,7 @@ exports.socketCtrl = {
     let chatID = req.params.chatID;
     let chat = await MessageModel.findById(chatID);
     try {
-      let user = await UserModel.findById(req.tokenData._id).populate({
+      let user = await UserModel.findById(chat.userID).populate({
         path: "messages",
       });
       user.messages = await user.messages.filter((msg) => msg._id === chatID);
@@ -122,7 +122,7 @@ exports.socketCtrl = {
       owner.messages = await owner.messages.filter((msg) => msg._id === chatID);
       await owner.save();
       await MessageModel.deleteOne({_id: chatID})
-      return res.sendStatus(200);
+      return res.status(200).json({user , owner});
     } catch (err) {
       res.status(500).json({ err: err });
     }

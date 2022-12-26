@@ -13,6 +13,7 @@ const messageSchema = new mongoose.Schema({
     userImg: String,
     roomID: String,
     creatorID: String,
+    userID : String,
     messagesArr:[messageObj]
 } , { timestamps: true })
 
