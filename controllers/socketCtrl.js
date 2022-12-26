@@ -22,7 +22,7 @@ exports.socketCtrl = {
           { _id: req.body.creatorID },
           { $push: { messages: newMessage._id } }
         );
-        return res.status(200).json({user, creator});
+        return res.status(200).json({ user, creator });
       } else {
         // console.log(req.body.messageObj.messages)
         let message = await MessageModel.findOneAndUpdate(
@@ -56,7 +56,7 @@ exports.socketCtrl = {
       path: "messages",
     });
     try {
-      let messages = message.messages.sort(function(a, b) {
+      let messages = message.messages.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),
           keyB = new Date(b.updatedAt);
         // Compare the 2 dates
@@ -70,26 +70,49 @@ exports.socketCtrl = {
     }
   },
   deleteMessage: async (req, res) => {
-    
-  },
-  deleteChat: async (req, res) => {
-    let chatID = req.params.chatID
-    try{
-      let chat = await MessageModel.findOne({_id: chatID})
-      let owner = await UserModel.findById(chat.creatorID).populate({
-        path: "messages",
-      });
-      owner.messages = owner.messages.filter(msg => msg._id === chatID)
-      await owner.save()
-      let user = await UserModel.findById(req.tokenData._id).populate({
-        path: "messages",
-      });
-      user.messages = await user.messages.filter(msg => msg._id === chatID)
-      await user.save()
-      await MessageModel.deleteOne({_id: chatID})
-      return res.sendStatus(200)
+    let msgID = req.params.msgID;
+    let chatID = req.params.chatID;
+    try {
+      let chat = await MessageModel.findOne({ _id: chatID });
+      chat.messagesArr = chat.messagesArr.filter((msg) => String(msg._id)!== msgID);
+      if (chat.messagesArr.length === 0) {
+        try {
+          let chat = await MessageModel.findOne({ _id: chatID });
+          let owner = await UserModel.findById(chat.creatorID).populate({
+            path: "messages",
+          });
+          owner.messages = owner.messages.filter((msgS) => String(msgS._id) !== chatID);
+          await owner.save();
+          let user = await UserModel.findById(req.tokenData._id).populate({
+            path: "messages",
+          });
+          user.messages = await user.messages.filter(
+            (msgS) => String(msgS._id) !== chatID
+          );
+          await user.save();
+          await MessageModel.deleteOne({ _id: chatID });
+          return res.sendStatus(200);
+        } catch (err) {
+          res.status(500).json({ err: err });
+        }
+      }
+      await chat.save();
+      return res.sendStatus(200);
     } catch (err) {
       res.status(500).json({ err: err });
     }
-  }
+  },
+  deleteChat: async (req, res) => {
+    let chatID = req.params.chatID;
+    try {
+      let user = await UserModel.findById(req.tokenData._id).populate({
+        path: "messages",
+      });
+      user.messages = await user.messages.filter((msg) => msg._id === chatID);
+      await user.save();
+      return res.sendStatus(200);
+    } catch (err) {
+      res.status(500).json({ err: err });
+    }
+  },
 };
