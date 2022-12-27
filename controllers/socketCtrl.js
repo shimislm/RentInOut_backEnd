@@ -74,10 +74,9 @@ exports.socketCtrl = {
     let roomID = req.params.roomID;
     try {
       let chat = await MessageModel.findOne({ roomID: roomID });
-      chat.messagesArr = chat.messagesArr.filter(
-        (msg) => String(msg._id) !== String(msgID)
-      );
-      await chat.save();
+      chat.messagesArr.splice(msgID, 1)
+      await chat.save().then(() => {console.log(chat.messagesArr.length)});
+      
       if (chat.messagesArr.length < 1) {
         try {
           let owner = await UserModel.findById(chat.creatorID).populate({
