@@ -77,7 +77,7 @@ exports.socketCtrl = {
       chat.messagesArr = chat.messagesArr.filter(
         (msg) => String(msg._id) !== String(msgID)
       );
-      if (chat.messagesArr.length === 0) {
+      if (chat.messagesArr.length < 1) {
         try {
           let owner = await UserModel.findById(chat.creatorID).populate({
             path: "messages",
