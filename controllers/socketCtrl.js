@@ -77,12 +77,11 @@ exports.socketCtrl = {
       chat.messagesArr = chat.messagesArr.filter(
         (msg) => String(msg._id) !== String(msgID)
       );
-      if (chat.messagesArr.length < 1) {
+      if (chat.messagesArr.length <= 1) {
         try {
           let owner = await UserModel.findById(chat.creatorID).populate({
             path: "messages",
           });
-
           owner.messages = owner.messages.filter(
             (msg) => String(msg._id) !== String(chat._id)
           );
@@ -95,6 +94,7 @@ exports.socketCtrl = {
           );
           await user.save();
           await MessageModel.deleteOne({ _id: chat._id });
+          await chat.save();
           return res.status(200).json({user , owner});
         } catch (err) {
           res.status(500).json({ err: err });
