@@ -20,6 +20,16 @@ exports.postCtrl = {
       res.status(500).json({ err: err });
     }
   },
+  postByID: async (req, res) => {
+    let postID = req.params.postID;
+    try {
+      const post = await PostModel.findById(postID);
+      res.status(200).json(post);
+    }
+    catch (err) {
+      res.status(500).json({ err: "cannot find the post.." });
+    }
+  },
   upload: async (req, res) => {
     let validBody = validatePost(req.body);
     if (validBody.error) {
