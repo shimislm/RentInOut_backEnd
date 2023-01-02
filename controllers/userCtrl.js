@@ -157,7 +157,6 @@ exports.userCtrl = {
   rankUser: async (req, res) => {
     let rankedUserId = req.params.userID;
     const rnk = req.body.rnk;
-    console.log(rnk);
     if (rnk > 5) {
       return res.status(401).json({ msg: "Cant rank more than 5" });
     }
@@ -165,15 +164,19 @@ exports.userCtrl = {
       let user = await UserModel.findOne({
         $and: [{ _id: rankedUserId }, { _id: { $ne: req.tokenData._id } }],
       });
-      let found;
-      found = user.rank.some((el) => el.user_id === req.tokenData._id);
+      let found = user.rank.some((el) => el.user_id === req.tokenData._id);
       if (!found) {
         user.rank.push({ user_id: req.tokenData._id, rank: rnk });
         await user.save();
         res.status(201).json({ msg: "rank succeed" });
       } else {
-        return res.status(401).json({ msg: "Cant rank more than once" });
-      }
+        user.rank.map((el) => {
+          if(el.user_id === req.tokenData._id)
+            el.rank = rnk;
+        });
+        await user.save();
+        return res.status(201).json({ msg: "rank override succeed" });
+        }
     } catch (err) {
       console.log(err);
       return res

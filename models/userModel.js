@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   rank: {
-    type: Array(rank),
+    type: [rank],
     default: [],
   },
   productsList: {
