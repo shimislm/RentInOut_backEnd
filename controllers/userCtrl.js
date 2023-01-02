@@ -186,11 +186,16 @@ exports.userCtrl = {
   },
   avgRank: async (req, res) => {
     let rankedUserId = req.params.userID;
+    let rankingUser = req.query?.rankingUser
     try {
       let { rank } = await UserModel.findOne({ _id: rankedUserId });
+      let userRanked = rank.find(el => el.user_id === rankingUser)
+      let userRank = 0
+      if(userRanked)
+          userRank = userRanked.rank
       let ranks = rank.map((el) => el.rank);
       const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-      res.status(200).json({ average });
+      res.status(200).json({ average , userRank});
     } catch (err) {
       console.log(err);
       return res
