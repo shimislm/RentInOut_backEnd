@@ -160,6 +160,8 @@ exports.userCtrl = {
     if (rnk > 5) {
       return res.status(401).json({ msg: "Cant rank more than 5" });
     }
+    if(rankedUserId === req.tokenData._id )
+      return res.status(401).json({msg: "You can't rank yourself"})
     try {
       let user = await UserModel.findOne({
         $and: [{ _id: rankedUserId }, { _id: { $ne: req.tokenData._id } }],
