@@ -127,7 +127,8 @@ exports.postCtrl = {
       })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
+        .sort({ [sort]: reverse })
+        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 } });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -162,7 +163,8 @@ exports.postCtrl = {
       let posts = await PostModel.find({ creator_id: id })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
+        .sort({ [sort]: reverse })
+        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 } });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
