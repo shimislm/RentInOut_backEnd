@@ -15,7 +15,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .populate({path: "creator_id"});
+        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 } })
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
