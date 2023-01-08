@@ -22,7 +22,10 @@ const postSchema = new mongoose.Schema({
     enum: ["long-term", "short-term"],
     default: "short-term",
   },
-  creator_id: mongoose.Types.ObjectId,
+  creator_id: {
+    type: mongoose.Types.ObjectId ,
+    ref: "users"
+},
   category_url: {
     type: String,
     default: "skate",

@@ -11,15 +11,15 @@ exports.categoryCtrl = {
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await CategoryModel                
-      .find({})
-      .limit(perPage)
-      .skip((page - 1) * perPage)
-      .sort({ [sort]: reverse })
-      res.json(data);
+      let data = await CategoryModel.find({ password: 0 })
+        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .sort({ [sort]: reverse })
+        .populate({ path: "creator_id" })
+        .populate({ path: "editor_id" });
+      return res.json(data);
     } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "there error try again later", err });
+      return res.status(500).json({ msg: "there error try again later", err });
     }
   },
   search: async (req, res) => {
@@ -28,20 +28,26 @@ exports.categoryCtrl = {
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-        let searchQ = req.query?.s;
-        let searchReg = new RegExp(searchQ, "i");
-        let category = await CategoryModel.find({
-            $and: [{ $or: [{ name: searchReg }, { info: searchReg ,url_name : searchReg }] },]
-        })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })
-        res.json(category);
+      let searchQ = req.query?.s;
+      let searchReg = new RegExp(searchQ, "i");
+      let category = await CategoryModel.find({
+        $and: [
+          {
+            $or: [
+              { name: searchReg },
+              { info: searchReg, url_name: searchReg },
+            ],
+          },
+        ],
+      })
+        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .sort({ [sort]: reverse });
+      res.json(category);
+    } catch (err) {
+      res.status(500).json({ message: err });
     }
-    catch (err) {
-        res.status(500).json({ message: err });
-    }
-},
+  },
 
   addCategory: async (req, res) => {
     let validBody = validateCategory(req.body);
@@ -56,12 +62,10 @@ exports.categoryCtrl = {
       return res.json(category);
     } catch (err) {
       if (err.code == 11000) {
-        return res
-          .status(409)
-          .json({
-            msg: "Category already in system, try different",
-            code: 11000,
-          });
+        return res.status(409).json({
+          msg: "Category already in system, try different",
+          code: 11000,
+        });
       }
       return res.status(500).json({ msg: "err", err });
     }
@@ -79,7 +83,7 @@ exports.categoryCtrl = {
       category.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       category.editor_id = req.tokenData._id;
       category.save();
-      res.json({category});
+      res.json({ category });
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });

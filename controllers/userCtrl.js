@@ -160,8 +160,8 @@ exports.userCtrl = {
     if (rnk > 5) {
       return res.status(401).json({ msg: "Cant rank more than 5" });
     }
-    if(rankedUserId === req.tokenData._id )
-      return res.status(401).json({msg: "You can't rank yourself"})
+    if (rankedUserId === req.tokenData._id)
+      return res.status(401).json({ msg: "You can't rank yourself" });
     try {
       let user = await UserModel.findOne({
         $and: [{ _id: rankedUserId }, { _id: { $ne: req.tokenData._id } }],
@@ -173,12 +173,11 @@ exports.userCtrl = {
         res.status(201).json({ msg: "rank succeed" });
       } else {
         user.rank.map((el) => {
-          if(el.user_id === req.tokenData._id)
-            el.rank = rnk;
+          if (el.user_id === req.tokenData._id) el.rank = rnk;
         });
         await user.save();
         return res.status(201).json({ msg: "rank override succeed" });
-        }
+      }
     } catch (err) {
       console.log(err);
       return res
@@ -188,16 +187,15 @@ exports.userCtrl = {
   },
   avgRank: async (req, res) => {
     let rankedUserId = req.params.userID;
-    let rankingUser = req.query?.rankingUser
+    let rankingUser = req.query?.rankingUser;
     try {
       let { rank } = await UserModel.findOne({ _id: rankedUserId });
-      let userRanked = rank.find(el => el.user_id === rankingUser)
-      let userRank = 0
-      if(userRanked)
-          userRank = userRanked.rank
+      let userRanked = rank.find((el) => el.user_id === rankingUser);
+      let userRank = 0;
+      if (userRanked) userRank = userRanked.rank;
       let ranks = rank.map((el) => el.rank);
       const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-      res.status(200).json({ average , userRank});
+      res.status(200).json({ average, userRank });
     } catch (err) {
       console.log(err);
       return res
@@ -297,11 +295,10 @@ exports.userCtrl = {
     });
   },
   getUserWishList: async (req, res) => {
-    let user = await UserModel.findOne({ _id: req.tokenData._id }).populate({
-      path: "wishList",
-    });
+    let user = await UserModel.findOne({ _id: req.tokenData._id })
+    .populate({path: "wishList"});
     try {
-      let wishList = user.wishList.sort(function(a, b) {
+      let wishList = user.wishList.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),
           keyB = new Date(b.updatedAt);
         // Compare the 2 dates
@@ -315,5 +312,4 @@ exports.userCtrl = {
       res.status(500).json({ err: err });
     }
   },
-
 };

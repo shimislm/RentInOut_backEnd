@@ -14,7 +14,8 @@ exports.postCtrl = {
       let posts = await PostModel.find({})
         .sort({ [sort]: reverse })
         .limit(perPage)
-        .skip((page - 1) * perPage);
+        .skip((page - 1) * perPage)
+        .populate({path: "creator_id"});
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -23,7 +24,8 @@ exports.postCtrl = {
   postByID: async (req, res) => {
     let postID = req.params.postID;
     try {
-      const post = await PostModel.findById(postID);
+      const post = await PostModel.findById(postID)
+      .populate({path: "creator_id"});
       res.status(200).json(post);
     }
     catch (err) {
