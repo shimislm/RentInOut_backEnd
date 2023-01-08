@@ -2,7 +2,6 @@ const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
 const { createToken } = require("../helpers/userHelper");
-const { MessageModel, MessageObjModel } = require("../models/messageModel");
 const cloudinary = require("cloudinary").v2;
 
 exports.userCtrl = {

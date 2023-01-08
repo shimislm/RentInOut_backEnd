@@ -1,4 +1,4 @@
-const express = require("express");
+const { select } = require("../helpers/userHelper");
 const { CategoryModel } = require("../models/categoryModel");
 const { validateCategory } = require("../validations/categoryValid");
 const MAX = 10000000;
@@ -15,8 +15,8 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } })
-        .populate({ path: "editor_id", select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } });
+        .populate({ path: "creator_id" , select:select })
+        .populate({ path: "editor_id", select:select });
       return res.json(data);
     } catch (err) {
       return res.status(500).json({ msg: "there error try again later", err });
@@ -43,8 +43,8 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } })
-        .populate({ path: "editor_id", select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1, "phone" :1 } });;
+        .populate({ path: "creator_id" , select:select})
+        .populate({ path: "editor_id", select:select});;
       res.json(category);
     } catch (err) {
       res.status(500).json({ message: err });

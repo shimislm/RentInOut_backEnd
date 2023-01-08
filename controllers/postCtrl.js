@@ -1,4 +1,5 @@
 const { config } = require("dotenv");
+const { select } = require("../helpers/userHelper");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel");
 const { validatePost } = require("../validations/postValid");
@@ -15,7 +16,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } })
+        .populate({ path: "creator_id" , select: select })
       return res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -25,7 +26,7 @@ exports.postCtrl = {
     let postID = req.params.postID;
     try {
       const post = await PostModel.findById(postID)
-      .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } })
+      .populate({ path: "creator_id" , select:select })
       res.status(200).json(post);
     }
     catch (err) {
@@ -128,7 +129,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1, "phone" :1  } });
+        .populate({ path: "creator_id" , select: select });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -164,7 +165,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:{"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 } });
+        .populate({ path: "creator_id" , select:select });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
