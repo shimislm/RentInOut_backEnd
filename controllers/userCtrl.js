@@ -191,7 +191,7 @@ exports.userCtrl = {
       let { rank } = await UserModel.findOne({ _id: rankedUserId });
       let userRanked = rank.find((el) => el.user_id === rankingUser);
       let userRank = 0;
-      if (userRanked) userRank = userRanked.rank;
+      if (userRanked) rank.userRank = userRanked.rank;
       let ranks = rank.map((el) => el.rank);
       const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
       res.status(200).json({ average, userRank });

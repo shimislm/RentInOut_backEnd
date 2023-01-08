@@ -7,7 +7,8 @@ const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
-exports.select = {"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1 }
+//populate creator filter
+exports.select = {"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1, "createdAt": 1 }
 exports.createToken = (_id, role) =>{
     let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
