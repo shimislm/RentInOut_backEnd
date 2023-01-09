@@ -188,15 +188,14 @@ exports.userCtrl = {
     let rankedUserId = req.params.userID;
     let rankingUser = req.query?.rankingUser;
     try {
-      let { rank } = await UserModel.findOne({ _id: rankedUserId });
-      let userRanked = rank.find((el) => el.user_id === rankingUser);
+      let user = await UserModel.findOne({ _id: rankedUserId });
+      let userRanked = user.rank.find((el) => el.user_id === rankingUser);
       let userRank = 0;
-      if (userRanked) rank.userRank = userRanked.rank;
-      let ranks = rank.map((el) => el.rank);
+      if (userRanked) user.rank.userRank = userRanked.rank;
+      let ranks = user.rank.map((el) => el.rank);
       const average = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-      res.status(200).json({ average, userRank });
+      return res.status(200).json({ average, userRank: user.rank.userRank });
     } catch (err) {
-      console.log(err);
       return res
         .status(500)
         .json({ msg: "Error occured try again later", err });
@@ -294,8 +293,9 @@ exports.userCtrl = {
     });
   },
   getUserWishList: async (req, res) => {
-    let user = await UserModel.findOne({ _id: req.tokenData._id })
-    .populate({path: "wishList"});
+    let user = await UserModel.findOne({ _id: req.tokenData._id }).populate({
+      path: "wishList",
+    });
     try {
       let wishList = user.wishList.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),
