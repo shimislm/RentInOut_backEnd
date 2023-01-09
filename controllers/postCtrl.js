@@ -16,7 +16,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .populate({ path: "creator_id" , select: select })
+        .populate({ path: "creator_id" , select })
       return res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -26,7 +26,7 @@ exports.postCtrl = {
     let postID = req.params.postID;
     try {
       const post = await PostModel.findById(postID)
-      .populate({ path: "creator_id" , select:select })
+      .populate({ path: "creator_id" , select })
       res.status(200).json(post);
     }
     catch (err) {
@@ -129,7 +129,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select: select });
+        .populate({ path: "creator_id" , select});
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -165,7 +165,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:select });
+        .populate({ path: "creator_id" , select });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });

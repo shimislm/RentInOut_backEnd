@@ -296,7 +296,7 @@ exports.userCtrl = {
   getUserWishList: async (req, res) => {
     let user = await UserModel.findOne({ _id: req.tokenData._id })
       .populate({
-        path: "wishList", populate: {path: "creator_id"}
+        path: "wishList", populate: {path: "creator_id", select}
       })
     try {    
       let wishListArr = user.wishList.sort(function (a, b) {

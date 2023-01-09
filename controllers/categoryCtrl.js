@@ -15,8 +15,8 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:select })
-        .populate({ path: "editor_id", select:select });
+        .populate({ path: "creator_id" , select })
+        .populate({ path: "editor_id", select });
       return res.json(data);
     } catch (err) {
       return res.status(500).json({ msg: "there error try again later", err });
@@ -43,8 +43,8 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select:select})
-        .populate({ path: "editor_id", select:select});;
+        .populate({ path: "creator_id" , select})
+        .populate({ path: "editor_id", select});;
       res.json(category);
     } catch (err) {
       res.status(500).json({ message: err });
