@@ -1,7 +1,8 @@
 const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
-const { createToken } = require("../helpers/userHelper");
+const { createToken, select } = require("../helpers/userHelper");
+const { PostModel } = require("../models/postModel");
 const cloudinary = require("cloudinary").v2;
 
 exports.userCtrl = {
@@ -293,11 +294,12 @@ exports.userCtrl = {
     });
   },
   getUserWishList: async (req, res) => {
-    let user = await UserModel.findOne({ _id: req.tokenData._id }).populate({
-      path: "wishList",
-    });
-    try {
-      let wishList = user.wishList.sort(function (a, b) {
+    let user = await UserModel.findOne({ _id: req.tokenData._id })
+      .populate({
+        path: "wishList", populate: {path: "creator_id"}
+      })
+    try {    
+      let wishListArr = user.wishList.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),
           keyB = new Date(b.updatedAt);
         // Compare the 2 dates
@@ -305,9 +307,8 @@ exports.userCtrl = {
         if (keyA < keyB) return 1;
         return 0;
       });
-      return res.status(200).json(wishList);
+      return res.status(200).json({wishList:user.wishList});
     } catch (err) {
-      console.log(err);
       res.status(500).json({ err: err });
     }
   },
