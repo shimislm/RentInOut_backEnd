@@ -299,7 +299,7 @@ exports.userCtrl = {
         path: "wishList", populate: {path: "creator_id", select}
       })
     try {    
-      let wishListArr = user.wishList.sort(function (a, b) {
+      let wishList = user.wishList.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),
           keyB = new Date(b.updatedAt);
         // Compare the 2 dates
@@ -307,7 +307,7 @@ exports.userCtrl = {
         if (keyA < keyB) return 1;
         return 0;
       });
-      return res.status(200).json({wishList:user.wishList});
+      return res.status(200).json(wishList);
     } catch (err) {
       res.status(500).json({ err: err });
     }
