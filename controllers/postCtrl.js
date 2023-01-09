@@ -41,7 +41,8 @@ exports.postCtrl = {
     try {
       let post = new PostModel(req.body);
       post.creator_id = req.tokenData._id;
-      post.save();
+       await post.save();
+      console.log(post)
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
