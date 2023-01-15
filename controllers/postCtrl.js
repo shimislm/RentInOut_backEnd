@@ -1,8 +1,10 @@
-const { config } = require("dotenv");
+
+const { config } = require("../config/config");
 const { select } = require("../helpers/userHelper");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel");
 const { validatePost } = require("../validations/postValid");
+const cloudinary = require("cloudinary").v2;
 const MAX = 10000000;
 const MIN = 0;
 exports.postCtrl = {
@@ -16,7 +18,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .populate({ path: "creator_id" , select })
+        .populate({ path: "creator_id", select });
       return res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -25,11 +27,12 @@ exports.postCtrl = {
   postByID: async (req, res) => {
     let postID = req.params.postID;
     try {
-      const post = await PostModel.findById(postID)
-      .populate({ path: "creator_id" , select })
+      const post = await PostModel.findById(postID).populate({
+        path: "creator_id",
+        select,
+      });
       res.status(200).json(post);
-    }
-    catch (err) {
+    } catch (err) {
       res.status(500).json({ err: "cannot find the post.." });
     }
   },
@@ -41,8 +44,8 @@ exports.postCtrl = {
     try {
       let post = new PostModel(req.body);
       post.creator_id = req.tokenData._id;
-       await post.save();
-      console.log(post)
+      await post.save();
+      console.log(post);
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -73,8 +76,20 @@ exports.postCtrl = {
     }
   },
   delete: async (req, res) => {
+    let postID = req.params.postID;
+    let details = {
+      cloud_name: config.cloudinary_post_name,
+      api_key: config.cloudinary_post_key,
+      api_secret: config.cloudinary_post_secret,
+      type: "upload",
+    };
+    let post = await PostModel.findById(postID);
+    post.img.forEach((img) => {
+      cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
+        if (error) return res.json({ error });
+      });
+    });
     try {
-      let postID = req.params.postID;
       let data;
       if (req.tokenData.role === "admin") {
         data = await PostModel.deleteOne({ _id: postID }, req.body);
@@ -130,7 +145,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select});
+        .populate({ path: "creator_id", select });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -166,7 +181,7 @@ exports.postCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select });
+        .populate({ path: "creator_id", select });
       res.json(posts);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -266,5 +281,42 @@ exports.postCtrl = {
     } catch (err) {
       res.status(500).json({ msg: "err", err });
     }
+  },
+  onCancelDel: async (req, res) => {
+    let images = req.body;
+    let details = {
+      cloud_name: config.cloudinary_post_name,
+      api_key: config.cloudinary_post_key,
+      api_secret: config.cloudinary_post_secret,
+      type: "upload",
+    };
+    try {
+      images.forEach((img) => {
+        cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
+          if (error) return res.json({ error });
+        });
+      });
+      return res.json({ msg: "delete all images succeed" });
+    } catch (err) {
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+  singlePostImgDelete: async (req, res) => {
+    let { postID, imgID } = req.params;
+    let details = {
+      cloud_name: config.cloudinary_post_name,
+      api_key: config.cloudinary_post_key,
+      api_secret: config.cloudinary_post_secret,
+      type: "upload",
+    };
+    let post = await PostModel.findById(postID);
+    post.img.filter((img) => {
+      img.img_id !== imgID;
+    });
+    await post.save();
+    cloudinary.uploader.destroy(imgID, details, (error, result) => {
+      if (error) return res.json({ error });
+    });
+    return res.json({ msg: "delete all images succeed" });
   },
 };

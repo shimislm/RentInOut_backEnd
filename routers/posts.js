@@ -19,6 +19,8 @@ router.get("/topThreeLikes/:postID",postCtrl.topThreeLikes);
 router.get("/countMyPosts", auth, postCtrl.countMyPosts);
 router.get("/userPosts/:userID" ,postCtrl.userPosts);
 router.post("/likePost/:postID",auth,  postCtrl.likePost)
+router.post("/singleImgDel/:postID/:imgID",auth,  postCtrl.singlePostImgDelete)
+router.post("/onCancelImgDel",auth,  postCtrl.onCancelDel)
 router.patch("/changeRange/:postID", auth, postCtrl.changeRange);
 router.patch("/changeActive/:postID", authAdmin, postCtrl.changeActive);
 
