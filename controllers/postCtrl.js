@@ -46,6 +46,7 @@ exports.postCtrl = {
       post.creator_id = req.tokenData._id;
       await post.save();
       console.log(post);
+      post = post.populate({path: "creator_id", select})
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
