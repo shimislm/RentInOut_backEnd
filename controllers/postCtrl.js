@@ -131,7 +131,7 @@ exports.postCtrl = {
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
         .populate({ path: "creator_id" , select});
-      res.json(posts);
+      res.json({msg:posts.length, posts});
     } catch (err) {
       res.status(500).json({ err: err });
     }
