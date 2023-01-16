@@ -49,7 +49,7 @@ router.patch("/uploadBanner", auth, userCtrl.uploadBanner)
 router.patch("/chatUpdate", auth, socketCtrl.chatUpdate)
 router.delete("/deleteMessage/:roomID/:msgID", auth, socketCtrl.deleteMessage) 
 // delete from cloudinary
-router.post("/cloudinary/profileDel", auth, userCtrl.profileImgDelete)
+router.post("/cloudinary/profileDel", userCtrl.profileImgDelete)
 router.post("/cloudinary/bannerDel", auth, userCtrl.bannerImgDelete)
 
 

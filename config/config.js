@@ -18,4 +18,7 @@ exports.config = {
     cloudinary_banner_name : process.env.CLODINARY_BANNER_NAME,
     cloudinary_banner_key : process.env.CLODINARY_BANNER_KEY,
     cloudinary_banner_secret : process.env.CLODINARY_BANNER_SECRET,
+    cloudinary_post_name : process.env.CLODINARY_POST_NAME,
+    cloudinary_post_key : process.env.CLODINARY_POST_KEY,
+    cloudinary_post_secret : process.env.CLODINARY_POST_SECRET,
   }
