@@ -36,10 +36,7 @@ const postSchema = new mongoose.Schema({
     enum: ["rent", "exchange", "delivery"],
     default: "rent",
   },
-  collect_points: {
-    type: [String],
-    default: [],
-  },
+  collect_points:[],
   active: {
     type: Boolean,
     default: true,

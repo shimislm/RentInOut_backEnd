@@ -16,7 +16,7 @@ exports.validatePost = (_reqBody) => {
     city: Joi.string().min(2).max(50).required(),
     category_url : Joi.string().min(2).max(50).required(),
     img : Joi.array().items(cloudinary),
-    collect_points : Joi.array().items(String)
+    collect_points : Joi.array().items()
   });
   return joiSchema.validate(_reqBody);
 };
