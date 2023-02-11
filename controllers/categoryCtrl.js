@@ -15,7 +15,7 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select })
+        .populate({ path: "creator_id", select })
         .populate({ path: "editor_id", select });
       return res.json(data);
     } catch (err) {
@@ -43,9 +43,9 @@ exports.categoryCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
-        .populate({ path: "creator_id" , select})
-        .populate({ path: "editor_id", select});;
-      res.json(category);
+        .populate({ path: "creator_id", select })
+        .populate({ path: "editor_id", select });
+      return res.json(category);
     } catch (err) {
       res.status(500).json({ message: err });
     }
@@ -57,11 +57,14 @@ exports.categoryCtrl = {
       res.status(400).json(validBody.error.details);
     }
     try {
-      let category = new CategoryModel(req.body);
-      category.creator_id = req.tokenData._id;
-      category.editor_id = req.tokenData._id;
-      await category.save();
-      return res.json(category);
+      let newCategory = new CategoryModel(req.body);
+      newCategory.creator_id = req.tokenData._id;
+      newCategory.editor_id = req.tokenData._id;
+      await newCategory.save();
+      let category = await CategoryModel.findById(newCategory._id)
+        .populate({ path: "creator_id", select })
+        .populate({ path: "editor_id", select });
+        res.json(category);
     } catch (err) {
       if (err.code == 11000) {
         return res.status(409).json({
