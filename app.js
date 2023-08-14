@@ -37,7 +37,7 @@ app.get("/" , (req,res)=> {
   res.json("Socket ready")
 })
 let port = process.env.PORT || 3001
-server.listen(port , ()=>{
+server.listen(port , ()=>{  
     console.log(`Server is running on port: ${port}`)
 });
 io.on('connection', sockets)

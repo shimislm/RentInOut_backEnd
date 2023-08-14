@@ -12,3 +12,4 @@ router.get("/search", authAdmin, categoryCtrl.search)
 
 module.exports = router;
 
+

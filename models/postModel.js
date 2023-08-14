@@ -1,15 +1,6 @@
 const mongoose = require("mongoose");
 
 const cloudinary = { url: String, img_id: String };
-// helper object for likes
-const likesObject = {
-  user_id: String,
-  profile_img: String,
-  fullName: {
-    firstName: String,
-    lastName: String,
-  },
-};
 const postSchema = new mongoose.Schema({
   title: String,
   info: String,
@@ -49,8 +40,8 @@ const postSchema = new mongoose.Schema({
   city: String,
   category_url: String,
   likes: {
-    type: [likesObject],
-    default: [],
+    type: [mongoose.Types.ObjectId],
+    ref: "user",
   },
   createdAt: {
     type: Number,
