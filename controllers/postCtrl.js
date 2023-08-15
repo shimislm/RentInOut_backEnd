@@ -7,6 +7,7 @@ const { validatePost } = require("../validations/postValid");
 const cloudinary = require("cloudinary").v2;
 const MAX = 10000000;
 const MIN = 0;
+
 exports.postCtrl = {
   getAll: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
@@ -18,6 +19,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
+        .populate({ path: "likes", select })
         .populate({ path: "creator_id", select });
       return res.json(posts);
     } catch (err) {
@@ -45,7 +47,7 @@ exports.postCtrl = {
       let newPost = new PostModel(req.body);
       newPost.creator_id = req.tokenData._id;
       await newPost.save();
-      post = await PostModel.findById(newPost._id).populate({ path: "creator_id", select })
+      post = await PostModel.findById(newPost._id).populate({ path: "creator_id", select });
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -71,7 +73,7 @@ exports.postCtrl = {
       }
       res.status(400).json({ data: null, msg: "cannot edit post" });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(400).json({ err });
     }
   },
@@ -104,7 +106,7 @@ exports.postCtrl = {
       }
       res.status(400).json({ data: null, msg: "user cannot delete this post" });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(400).json({ err });
     }
   },
@@ -176,7 +178,6 @@ exports.postCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let id = req.params.userID;
-      console.log(id);
       let posts = await PostModel.find({ creator_id: id })
         .limit(perPage)
         .skip((page - 1) * perPage)
@@ -192,7 +193,6 @@ exports.postCtrl = {
       return res.status(400).json({ msg: "Need to send range in body" });
     }
     if (req.body.range != "long-term" && req.body.range != "short-term") {
-      console.log(typeof req.body.range);
       return res.status(400).json({ msg: "Range must be long/short-term" });
     }
     try {
@@ -224,49 +224,43 @@ exports.postCtrl = {
     }
   },
   likePost: async (req, res) => {
-    try {
-      // let user = await UserModel.findOne({ _id: req.tokenData._id })
-      // //creating an object from the user
-      // let userInfo = {
-      //   user_id: user._id,
-      //   profile_img: user.profile_img.url,
-      //   fullName: user.fullName,
-      // };
-      let postID = req.params.postID;
-      let post = await PostModel.findOne({ _id: postID })
-      .populate({ path: "creator_id", select });
-      // //need to check if the user already
-      // // if the user found in the array setup found true else false
-      console.log(req.tokenData._id)
-      // const found = post.likes.some((el) => el._id === req.tokenData._id);
-      // if (!found) {
-      //   post.likes.unshift(post.creator_id);
-      //   await post.save();
+    // find user by id
+    let user = await UserModel.findById(req.tokenData._id);
+    // get post from query params
+    let postID = req.params.postID;
+    // find the current post by id and get likes object from ID by populate
+    let post = await PostModel.findOne({ _id: postID })
+      .populate({ path: "likes", select });
 
-      //   // add to wish list
-      //   const inWishlist = user.wishList.some(
-      //     (el) => String(el._id) === postID
-      //   );
-      //   if (!inWishlist && String(post.creator_id) != req.tokenData._id) {
-      //     user.wishList.unshift(post._id);
-      //     await user.save();
-      //   }
-        return res
-          .status(201)
-          .json({ posts: post.likes,post:post, msg: "You like the post" });
-      // }
+    // if the user found in the array setup found true else false
+    const found = post.likes.some((el) => String(el.id) === req.tokenData._id);
+    if (!found) {
+      // add to array of likes
+      post.likes.unshift(req.tokenData._id);
+      await post.save();
 
-      // // remove from post like the user.
-      // post.likes = post.likes.filter((e) => e._id != req.tokenData._id);
-      // await post.save();
-
-      // // wish list remove item
-      // user.wishList = user.wishList.filter((el) => String(el._id) !== postID);
-      // await user.save();
-      // res.status(201).json({ posts: post.likes, msg: "unlike the post" });
-    } catch (err) {
-      res.status(500).json({ msg: "err", err });
+      // check if the post already in wish list 
+      const inWishlist = user.wishList.some((el) => el === postID);
+      // check two cases -
+      // 1. case 1 : if post not in wish list 
+      // 2. case 2 : creator can't move to wish list his items
+      if (!inWishlist && String(post.creator_id._id) !== req.tokenData._id) {
+        user.wishList.unshift(post._id);
+        await user.save();
+      }
+      return res
+        .status(201)
+        .json({ posts: post.likes, post: post, msg: "You like the post" });
     }
+
+    // remove from post like the user.
+    post.likes = post.likes.filter((e) => String(e._id) !== req.tokenData._id);
+    await post.save();
+
+    // wish list remove item
+    user.wishList = user.wishList.filter((el) => String(el) !== postID);
+    await user.save();
+    res.status(201).json({ posts: post.likes, msg: "unlike the post" });
   },
   countLikes: async (req, res) => {
     try {

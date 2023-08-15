@@ -24,7 +24,6 @@ exports.socketCtrl = {
         );
         return res.status(200).json({ user, creator });
       } else {
-        // console.log(req.body.messageObj.messages)
         let message = await MessageModel.findOneAndUpdate(
           { roomID: req.body.messageObj.roomID },
           { messagesArr: req.body.messageObj.messagesArr }
@@ -33,7 +32,7 @@ exports.socketCtrl = {
       }
       return res.status(200).json(message);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ err: err });
     }
   },

@@ -23,7 +23,6 @@ let mailOptions = (_email , _subject , _html) => {
 }
 exports.mailMe = {
     sendEmail: async (req, res) => {
-        console.log(req.body)
         let subject = "mail send from " + req.body.phone;
         let htmlMessage = `<div color:danger> <h2>${req.body.firstName} - ${req.body.lastName}</h2> <span>${req.body.phone}</span> | <span>${req.body.email}</span> <p>${req.body.textarea}</p> </div>`
         const email = mailOptions(req.body.email, subject, htmlMessage)
