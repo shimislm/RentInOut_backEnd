@@ -12,10 +12,14 @@ exports.userCtrl = {
   infoById: async (req, res) => {
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 }).populate({
+        path: "wishList",
+        populate: { path: "creator_id", select },
+      });
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
+      console.log(userInfo);
       return res.json({ userInfo });
     } catch (err) {
       console.error(err);
@@ -25,7 +29,10 @@ exports.userCtrl = {
   infoByIdWithToken: async (req, res) => {
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
+      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 }).populate({
+        path: "wishList",
+        populate: { path: "creator_id", select },
+      });
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -72,7 +79,10 @@ exports.userCtrl = {
           .status(401)
           .json({ msg: "You cant change Superadmin to user" });
       }
-      let user = await UserModel.findOne({ _id: userID });
+      let user = await UserModel.findOne({ _id: userID }).populate({
+        path: "wishList",
+        populate: { path: "creator_id", select },
+      });
       user.role = user.role == "admin" ? "user" : "admin";
       user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       user.save();
@@ -91,7 +101,10 @@ exports.userCtrl = {
           .status(401)
           .json({ msg: "You cant change superadmin to user" });
       }
-      let user = await UserModel.findOne({ _id: userID });
+      let user = await UserModel.findOne({ _id: userID }).populate({
+        path: "wishList",
+        populate: { path: "creator_id", select },
+      });
       user.active = !user.active;
       user.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       user.save();

@@ -19,6 +19,7 @@ exports.postCtrl = {
         .sort({ [sort]: reverse })
         .limit(perPage)
         .skip((page - 1) * perPage)
+        .populate({ path: "likes", select })
         .populate({ path: "creator_id", select });
       return res.json(posts);
     } catch (err) {
@@ -223,50 +224,43 @@ exports.postCtrl = {
     }
   },
   likePost: async (req, res) => {
-      // search user in likes array 
-      
-      let user = await PostModel.findOne({ _id: req.tokenData._id })
-        .populate({ path: "likes", select });
-      // //creating an object from the user
-      // let userInfo = {
-      //   user_id: user._id,
-      //   profile_img: user.profile_img.url,
-      //   fullName: user.fullName,
-      // };
-      let postID = req.params.postID;
-      // find the current post by id
-      let post = await PostModel.findOne({ _id: postID })
-        .populate({ path: "creator_id", select });
-      // //need to check if the user already
-      // // if the user found in the array setup found true else false
-      console.log(user ?? "not found");
-      // const found = post.likes.some((el) => el._id === req.tokenData._id);
-      // if (!found) {
-      //   post.likes.unshift(post.creator_id);
-      //   await post.save();
+    // find user by id
+    let user = await UserModel.findById(req.tokenData._id);
+    // get post from query params
+    let postID = req.params.postID;
+    // find the current post by id and get likes object from ID by populate
+    let post = await PostModel.findOne({ _id: postID })
+      .populate({ path: "likes", select });
 
-      //   // add to wish list
-      //   const inWishlist = user.wishList.some(
-      //     (el) => String(el._id) === postID
-      //   );
-      //   if (!inWishlist && String(post.creator_id) != req.tokenData._id) {
-      //     user.wishList.unshift(post._id);
-      //     await user.save();
-      //   }
-      // return res
-      //   .status(201)
-      //   .json({ posts: post.likes, post: post, msg: "You like the post" });
-      // }
+    // if the user found in the array setup found true else false
+    const found = post.likes.some((el) => String(el.id) === req.tokenData._id);
+    if (!found) {
+      // add to array of likes
+      post.likes.unshift(req.tokenData._id);
+      await post.save();
 
-      // // remove from post like the user.
-      // post.likes = post.likes.filter((e) => e._id != req.tokenData._id);
-      // await post.save();
+      // check if the post already in wish list 
+      const inWishlist = user.wishList.some((el) => el === postID);
+      // check two cases -
+      // 1. case 1 : if post not in wish list 
+      // 2. case 2 : creator can't move to wish list his items
+      if (!inWishlist && String(post.creator_id._id) !== req.tokenData._id) {
+        user.wishList.unshift(post._id);
+        await user.save();
+      }
+      return res
+        .status(201)
+        .json({ posts: post.likes, post: post, msg: "You like the post" });
+    }
 
-      // // wish list remove item
-      // user.wishList = user.wishList.filter((el) => String(el._id) !== postID);
-      // await user.save();
-      // res.status(201).json({ posts: post.likes, msg: "unlike the post" });
-    
+    // remove from post like the user.
+    post.likes = post.likes.filter((e) => String(e._id) !== req.tokenData._id);
+    await post.save();
+
+    // wish list remove item
+    user.wishList = user.wishList.filter((el) => String(el) !== postID);
+    await user.save();
+    res.status(201).json({ posts: post.likes, msg: "unlike the post" });
   },
   countLikes: async (req, res) => {
     try {
