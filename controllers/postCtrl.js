@@ -7,6 +7,7 @@ const { validatePost } = require("../validations/postValid");
 const cloudinary = require("cloudinary").v2;
 const MAX = 10000000;
 const MIN = 0;
+
 exports.postCtrl = {
   getAll: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
@@ -45,7 +46,7 @@ exports.postCtrl = {
       let newPost = new PostModel(req.body);
       newPost.creator_id = req.tokenData._id;
       await newPost.save();
-      post = await PostModel.findById(newPost._id).populate({ path: "creator_id", select })
+      post = await PostModel.findById(newPost._id).populate({ path: "creator_id", select });
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -71,7 +72,7 @@ exports.postCtrl = {
       }
       res.status(400).json({ data: null, msg: "cannot edit post" });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(400).json({ err });
     }
   },
@@ -104,7 +105,7 @@ exports.postCtrl = {
       }
       res.status(400).json({ data: null, msg: "user cannot delete this post" });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(400).json({ err });
     }
   },
@@ -176,7 +177,6 @@ exports.postCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
       let id = req.params.userID;
-      console.log(id);
       let posts = await PostModel.find({ creator_id: id })
         .limit(perPage)
         .skip((page - 1) * perPage)
@@ -192,7 +192,6 @@ exports.postCtrl = {
       return res.status(400).json({ msg: "Need to send range in body" });
     }
     if (req.body.range != "long-term" && req.body.range != "short-term") {
-      console.log(typeof req.body.range);
       return res.status(400).json({ msg: "Range must be long/short-term" });
     }
     try {
@@ -224,8 +223,10 @@ exports.postCtrl = {
     }
   },
   likePost: async (req, res) => {
-    try {
-      // let user = await UserModel.findOne({ _id: req.tokenData._id })
+      // search user in likes array 
+      
+      let user = await PostModel.findOne({ _id: req.tokenData._id })
+        .populate({ path: "likes", select });
       // //creating an object from the user
       // let userInfo = {
       //   user_id: user._id,
@@ -233,11 +234,12 @@ exports.postCtrl = {
       //   fullName: user.fullName,
       // };
       let postID = req.params.postID;
+      // find the current post by id
       let post = await PostModel.findOne({ _id: postID })
-      .populate({ path: "creator_id", select });
+        .populate({ path: "creator_id", select });
       // //need to check if the user already
       // // if the user found in the array setup found true else false
-      console.log(req.tokenData._id)
+      console.log(user ?? "not found");
       // const found = post.likes.some((el) => el._id === req.tokenData._id);
       // if (!found) {
       //   post.likes.unshift(post.creator_id);
@@ -251,9 +253,9 @@ exports.postCtrl = {
       //     user.wishList.unshift(post._id);
       //     await user.save();
       //   }
-        return res
-          .status(201)
-          .json({ posts: post.likes,post:post, msg: "You like the post" });
+      // return res
+      //   .status(201)
+      //   .json({ posts: post.likes, post: post, msg: "You like the post" });
       // }
 
       // // remove from post like the user.
@@ -264,9 +266,7 @@ exports.postCtrl = {
       // user.wishList = user.wishList.filter((el) => String(el._id) !== postID);
       // await user.save();
       // res.status(201).json({ posts: post.likes, msg: "unlike the post" });
-    } catch (err) {
-      res.status(500).json({ msg: "err", err });
-    }
+    
   },
   countLikes: async (req, res) => {
     try {

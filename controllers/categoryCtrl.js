@@ -90,7 +90,7 @@ exports.categoryCtrl = {
       category.save();
       res.json({ category });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -101,7 +101,7 @@ exports.categoryCtrl = {
       let data = await CategoryModel.deleteOne({ _id: idDel });
       res.json(data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -110,7 +110,7 @@ exports.categoryCtrl = {
       let count = await CategoryModel.countDocuments({});
       res.json({ count });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },

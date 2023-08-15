@@ -38,7 +38,7 @@ exports.authCtrl = {
           .status(409)
           .json({ msg: "Email already in system, try log in", code: 11000 });
       }
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -233,7 +233,6 @@ exports.authCtrl = {
               .status(401)
               .json({ msg_err: "User blocked/ need to verify your email" });
           }
-          console.log(userFound._id, userFound.role);
           let newToken = createToken(userFound._id, userFound.role);
           let success = {
             token: newToken,

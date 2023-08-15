@@ -15,7 +15,6 @@ exports.sockets = (socket) => {
     })
     socket.on('disconnect', ({messageObj , userID})=>{
         // let user = await UserModel.findById(userId).populate({path:'messages', model: "message"});
-        // console.log(user);
         // let user = await UserModel.updateOne({_id: userID}).populate({path:'messages', $push: "message"});
     })
 }

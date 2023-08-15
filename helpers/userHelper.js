@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
 //populate creator filter
-exports.select = {"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1, "createdAt": 1 }
+exports.select = {"_id":1 , "fullName":1 , "email" :1 ,"profile_img":1 , "country" :1 ,"city":1 , "phone" :1, "createdAt": 1, "likes": 1 }
 exports.createToken = (_id, role) =>{
     let token = jwt.sign({_id,role}, config.tokenSecret,{expiresIn:"15h"})
     return token;
@@ -36,10 +36,7 @@ return mailOptions;
 }
 
 exports.sendVerificationEmail = async({ _id, email }, res) => {
-    // console.log("email " + email)
-    // console.log("id " + _id)
     const uniqueString = uuidv4() + _id;
-    console.log(uniqueString , " " , _id)
     const html =`<p>Verify Your Email </p><p> click <a href=${config.domain+"/users/verify/"+_id+"/"+uniqueString}> here</a></p>`
     
     // creat an unique string
@@ -58,14 +55,12 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
             // send the email notification
             transporter.sendMail(mail, (err, info) => {
               if (err) {
-                console.log(err);
-              }
-              console.log('Message sent: %s', info.response );
-  
+                console.error(err);
+              }  
             })
           })
           .catch((error) => {
-            console.log(error)
+            console.error(error)
             res.json({
               status: "failed",
               message: "an error  cant save",
@@ -109,7 +104,7 @@ exports.sendVerificationEmail = async({ _id, email }, res) => {
           })
       })
       .catch((error)=>{
-        console.log(error)
+        console.error(error)
         res.json({
           status: "failed",
           message: "Error while cleaning existing requests",

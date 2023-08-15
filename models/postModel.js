@@ -41,7 +41,7 @@ const postSchema = new mongoose.Schema({
   category_url: String,
   likes: {
     type: [mongoose.Types.ObjectId],
-    ref: "user",
+    ref: "users",
   },
   createdAt: {
     type: Number,

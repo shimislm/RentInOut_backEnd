@@ -18,7 +18,7 @@ exports.userCtrl = {
       }
       return res.json({ userInfo });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({ msg: "err", err });
     }
   },
@@ -26,7 +26,6 @@ exports.userCtrl = {
     try {
       let id = req.params.id;
       let userInfo = await UserModel.findOne({ _id: id }, { password: 0 });
-      console.log(userInfo);
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -51,7 +50,7 @@ exports.userCtrl = {
         .sort({ [sort]: reverse });
       return res.json(data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({ msg: "err", err });
     }
   },
@@ -60,7 +59,7 @@ exports.userCtrl = {
       let count = await UserModel.countDocuments({});
       res.json({ count });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -79,7 +78,7 @@ exports.userCtrl = {
       user.save();
       return res.json(user);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({ msg: "err", err });
     }
   },
@@ -98,7 +97,7 @@ exports.userCtrl = {
       user.save();
       return res.json(user);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -120,7 +119,7 @@ exports.userCtrl = {
       }
       res.json(userInfo);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ msg: "err", err });
     }
   },
@@ -150,7 +149,7 @@ exports.userCtrl = {
       // else{ throw new Error}
       return res.status(200).json(user);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({ msg: "err", err });
     }
   },
@@ -179,7 +178,7 @@ exports.userCtrl = {
         return res.status(201).json({ msg: "rank override succeed" });
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res
         .status(500)
         .json({ msg: "Not possible to rank at this time", err });
@@ -231,7 +230,7 @@ exports.userCtrl = {
         .sort({ [sort]: reverse });
       return res.json(users);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ err: err });
     }
   },
@@ -253,7 +252,6 @@ exports.userCtrl = {
   },
   uploadBanner: async (req, res) => {
     let banner = req.body;
-    console.log(banner);
     if (banner) {
       try {
         let user = await UserModel.findOne({ _id: req.tokenData._id });
