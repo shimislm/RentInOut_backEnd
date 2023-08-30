@@ -12,14 +12,16 @@ exports.userCtrl = {
   infoById: async (req, res) => {
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 }).populate({
+      let userInfo = await UserModel.findOne(
+        { _id: id },
+        { password: 0 }
+      ).populate({
         path: "wishList",
         populate: { path: "creator_id", select },
       });
       if (!userInfo) {
         return res.status(404).json({ message: "User not found" });
       }
-      console.log(userInfo);
       return res.json({ userInfo });
     } catch (err) {
       console.error(err);
@@ -29,7 +31,10 @@ exports.userCtrl = {
   infoByIdWithToken: async (req, res) => {
     try {
       let id = req.params.id;
-      let userInfo = await UserModel.findOne({ _id: id }, { password: 0 }).populate({
+      let userInfo = await UserModel.findOne(
+        { _id: id },
+        { password: 0 }
+      ).populate({
         path: "wishList",
         populate: { path: "creator_id", select },
       });

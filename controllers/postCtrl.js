@@ -1,4 +1,3 @@
-
 const { config } = require("../config/config");
 const { select } = require("../helpers/userHelper");
 const { PostModel } = require("../models/postModel");
@@ -47,7 +46,10 @@ exports.postCtrl = {
       let newPost = new PostModel(req.body);
       newPost.creator_id = req.tokenData._id;
       await newPost.save();
-      post = await PostModel.findById(newPost._id).populate({ path: "creator_id", select });
+      post = await PostModel.findById(newPost._id).populate({
+        path: "creator_id",
+        select,
+      });
       res.status(201).json(post);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -79,32 +81,48 @@ exports.postCtrl = {
   },
   delete: async (req, res) => {
     let postID = req.params.postID;
+    // cloudinary details to destroy post
     let details = {
       cloud_name: config.cloudinary_post_name,
       api_key: config.cloudinary_post_key,
       api_secret: config.cloudinary_post_secret,
       type: "upload",
     };
+    // found post by id
     let post = await PostModel.findById(postID);
-    post.img.forEach((img) => {
-      cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
-        if (error) return res.json({ error });
+    console.log(`post founded - ${post._id}`);
+
+    // for each image delete from cloudinary to save memory space
+    const deleteCloudinaryImages = () => {
+      console.log("start deleting process");
+      post.img.forEach((img) => {
+        cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
+          if (error) return res.json({ error });
+        });
       });
-    });
+      console.log("end deleting process");
+    };
+
     try {
       let data;
+      // case 1: if the user is admin allow to delete in any case
       if (req.tokenData.role === "admin") {
         data = await PostModel.deleteOne({ _id: postID }, req.body);
-      } else {
+      }
+      // case 2: if the user ain't admin than check if he create the post
+      else {
         data = await PostModel.deleteOne(
           { _id: postID, creator_id: req.tokenData._id },
           req.body
         );
       }
       if (data.deletedCount === 1) {
+        deleteCloudinaryImages();
         return res.status(200).json({ data, msg: "post deleted" });
       }
-      res.status(400).json({ data: null, msg: "user cannot delete this post" });
+      return res
+        .status(400)
+        .json({ data: null, msg: "user cannot delete this post" });
     } catch (err) {
       console.error(err);
       res.status(400).json({ err });
@@ -229,8 +247,10 @@ exports.postCtrl = {
     // get post from query params
     let postID = req.params.postID;
     // find the current post by id and get likes object from ID by populate
-    let post = await PostModel.findOne({ _id: postID })
-      .populate({ path: "likes", select });
+    let post = await PostModel.findOne({ _id: postID }).populate({
+      path: "likes",
+      select,
+    });
 
     // if the user found in the array setup found true else false
     const found = post.likes.some((el) => String(el.id) === req.tokenData._id);
@@ -239,10 +259,10 @@ exports.postCtrl = {
       post.likes.unshift(req.tokenData._id);
       await post.save();
 
-      // check if the post already in wish list 
+      // check if the post already in wish list
       const inWishlist = user.wishList.some((el) => el === postID);
       // check two cases -
-      // 1. case 1 : if post not in wish list 
+      // 1. case 1 : if post not in wish list
       // 2. case 2 : creator can't move to wish list his items
       if (!inWishlist && String(post.creator_id._id) !== req.tokenData._id) {
         user.wishList.unshift(post._id);

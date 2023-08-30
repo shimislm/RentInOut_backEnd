@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "nodemon app.js",
-        "dev": "node app"
+        "start": "kill-port 3001 && nodemon app.js",
+        "dev": "kill-port 3001 && node app"
     },
     "keywords": [],
     "author": "",
@@ -31,5 +31,8 @@
         "passport-google-oauth2": "^0.2.0",
         "socket.io": "^4.5.4",
         "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+        "kill-port": "^2.0.1"
     }
 }
