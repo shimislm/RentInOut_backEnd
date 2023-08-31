@@ -90,17 +90,14 @@ exports.postCtrl = {
     };
     // found post by id
     let post = await PostModel.findById(postID);
-    console.log(`post founded - ${post._id}`);
 
     // for each image delete from cloudinary to save memory space
     const deleteCloudinaryImages = () => {
-      console.log("start deleting process");
       post.img.forEach((img) => {
         cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
           if (error) return res.json({ error });
         });
       });
-      console.log("end deleting process");
     };
 
     try {
@@ -247,10 +244,9 @@ exports.postCtrl = {
     // get post from query params
     let postID = req.params.postID;
     // find the current post by id and get likes object from ID by populate
-    let post = await PostModel.findOne({ _id: postID }).populate({
-      path: "likes",
-      select,
-    });
+    let post = await PostModel.findOne({ _id: postID })
+      .populate({ path: "likes", select })
+      .populate({ path: "creator_id", select });
 
     // if the user found in the array setup found true else false
     const found = post.likes.some((el) => String(el.id) === req.tokenData._id);

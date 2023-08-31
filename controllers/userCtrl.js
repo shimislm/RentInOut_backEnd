@@ -311,10 +311,15 @@ exports.userCtrl = {
   },
 
   getUserWishList: async (req, res) => {
-    let user = await UserModel.findOne({ _id: req.tokenData._id }).populate({
-      path: "wishList",
-      populate: { path: "creator_id", select },
-    });
+    let user = await UserModel.findOne({ _id: req.tokenData._id })
+      .populate({
+        path: "wishList",
+        populate: { path: "creator_id", select },
+      })
+      .populate({
+        path: "wishList",
+        populate: { path: "likes", select },
+      });
     try {
       let wishList = user.wishList.sort(function (a, b) {
         var keyA = new Date(a.updatedAt),

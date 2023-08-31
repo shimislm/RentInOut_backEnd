@@ -1,4 +1,3 @@
-const { config } = require("../config/config");
 const { MessageModel } = require("../models/messageModel");
 const { UserModel } = require("../models/userModel");
 
@@ -73,9 +72,11 @@ exports.socketCtrl = {
     let roomID = req.params.roomID;
     try {
       let chat = await MessageModel.findOne({ roomID: roomID });
-      chat.messagesArr.splice(msgID, 1)
-      await chat.save().then(() => {console.log(chat.messagesArr.length)});
-      
+      chat.messagesArr.splice(msgID, 1);
+      await chat.save().then(() => {
+        console.log(chat.messagesArr.length);
+      });
+
       if (chat.messagesArr.length < 1) {
         try {
           let owner = await UserModel.findById(chat.creatorID).populate({
@@ -93,7 +94,7 @@ exports.socketCtrl = {
           );
           await user.save();
           await MessageModel.deleteOne({ _id: chat._id });
-          return res.status(200).json({user , owner});
+          return res.status(200).json({ user, owner });
         } catch (err) {
           res.status(500).json({ err: err });
         }
@@ -112,14 +113,13 @@ exports.socketCtrl = {
       });
       user.messages = await user.messages.filter((msg) => msg._id !== chatID);
       await user.save();
-      let owner = await UserModel.findById(
-        chat.creatorID).populate({
+      let owner = await UserModel.findById(chat.creatorID).populate({
         path: "messages",
       });
       owner.messages = await owner.messages.filter((msg) => msg._id !== chatID);
       await owner.save();
-      await MessageModel.deleteOne({_id: chatID})
-      return res.status(200).json({user , owner});
+      await MessageModel.deleteOne({ _id: chatID });
+      return res.status(200).json({ user, owner });
     } catch (err) {
       res.status(500).json({ err: err });
     }
