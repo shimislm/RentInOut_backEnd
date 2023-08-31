@@ -22,6 +22,7 @@ app.use(
       "http://localhost:3000",
       "https://rentinout.netlify.app",
       "http://localhost:5173",
+      "https://rent-in-out.netlify.app",
     ],
     credentials: true,
   })

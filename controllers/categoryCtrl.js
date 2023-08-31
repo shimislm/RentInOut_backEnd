@@ -6,14 +6,10 @@ const MIN = 0;
 
 exports.categoryCtrl = {
   getCategorylist: async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 10;
-    let page = req.query.page || 1;
-    let sort = req.query.sort || "createdAt";
+    let sort = req.query.sort || "name";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await CategoryModel.find({ password: 0 })
-        .limit(perPage)
-        .skip((page - 1) * perPage)
+      let data = await CategoryModel.find({})
         .sort({ [sort]: reverse })
         .populate({ path: "creator_id", select })
         .populate({ path: "editor_id", select });
@@ -64,7 +60,7 @@ exports.categoryCtrl = {
       let category = await CategoryModel.findById(newCategory._id)
         .populate({ path: "creator_id", select })
         .populate({ path: "editor_id", select });
-        res.json(category);
+      res.json(category);
     } catch (err) {
       if (err.code == 11000) {
         return res.status(409).json({
