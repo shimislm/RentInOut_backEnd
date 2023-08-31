@@ -1,15 +1,13 @@
 const express = require("express");
-const { authAdmin, auth } = require("../middlewares/auth");
+const { authAdmin } = require("../middlewares/auth");
 const { categoryCtrl } = require("../controllers/categoryCtrl");
 const router = express.Router();
 
-router.get("/", auth, categoryCtrl.getCategorylist)
-router.post("/", authAdmin, categoryCtrl.addCategory)
-router.put("/:idEdit", authAdmin, categoryCtrl.editCategory)
-router.delete("/:idDel", authAdmin, categoryCtrl.deleteCategory)
-router.get("/count", authAdmin, categoryCtrl.countCategory)
-router.get("/search", authAdmin, categoryCtrl.search)
+router.get("/", categoryCtrl.getCategorylist);
+router.post("/", authAdmin, categoryCtrl.addCategory);
+router.put("/:idEdit", authAdmin, categoryCtrl.editCategory);
+router.delete("/:idDel", authAdmin, categoryCtrl.deleteCategory);
+router.get("/count", authAdmin, categoryCtrl.countCategory);
+router.get("/search", authAdmin, categoryCtrl.search);
 
 module.exports = router;
-
-
