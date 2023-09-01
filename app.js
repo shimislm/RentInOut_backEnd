@@ -23,6 +23,7 @@ app.use(
       "https://rentinout.netlify.app",
       "http://localhost:5173",
       "https://rent-in-out.netlify.app",
+      "https://rent-in-out-front.vercel.app",
     ],
     credentials: true,
   })
@@ -47,6 +48,7 @@ const io = new Server(server, {
       "http://localhost:3001",
       "http://localhost:5173",
       "https://rent-in-out.netlify.app",
+      "https://rent-in-out-front.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
