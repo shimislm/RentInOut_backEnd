@@ -45,7 +45,10 @@ const io = new Server(server, {
       "http://localhost:3000",
       "https://rentinout.netlify.app",
       "http://localhost:3001",
+      "http://localhost:5173",
+      "https://rent-in-out.netlify.app",
     ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 app.get("/", (req, res) => {
