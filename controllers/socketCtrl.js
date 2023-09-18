@@ -73,9 +73,7 @@ exports.socketCtrl = {
     try {
       let chat = await MessageModel.findOne({ roomID: roomID });
       chat.messagesArr.splice(msgID, 1);
-      await chat.save().then(() => {
-        console.log(chat.messagesArr.length);
-      });
+      await chat.save();
 
       if (chat.messagesArr.length < 1) {
         try {

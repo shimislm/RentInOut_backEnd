@@ -9,7 +9,7 @@ const MIN = 0;
 
 exports.postCtrl = {
   getAll: async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let perPage = Math.min(req.query.perPage, 20) || 15;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
@@ -144,24 +144,25 @@ exports.postCtrl = {
     }
   },
   search: async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let perPage = Math.min(req.query.perPage, 20) || 15;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let searchQ = req.query?.s;
-      let max = req.query.max || MAX;
-      let min = req.query.min || MIN;
+      let searchQ = req.query?.s || "";
+      let max = req.query?.max || MAX;
+      let min = req.query?.min || MIN;
+      let categories = req.query?.categories.split(",") || [];
       let searchReg = new RegExp(searchQ, "i");
+      console.log(categories);
       let posts = await PostModel.find({
-        $and: [
-          { $or: [{ title: searchReg }, { info: searchReg }] },
-          { $and: [{ price: { $gte: min } }, { price: { $lte: max } }] },
-        ],
+        title: searchReg,
+        price: { $gte: min, $lt: max },
       })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse })
+        .populate({ path: "likes", select })
         .populate({ path: "creator_id", select });
       res.json({ count: posts.length, posts });
     } catch (err) {
