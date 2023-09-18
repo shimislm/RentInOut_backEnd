@@ -1,4 +1,5 @@
 const { config } = require("../config/config");
+const { checkUndefinedOrNull } = require("../helpers/functions");
 const { select } = require("../helpers/userHelper");
 const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel");
@@ -148,13 +149,15 @@ exports.postCtrl = {
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
-      let searchQ = req.query?.s || "";
-      let max = req.query?.max || MAX;
-      let min = req.query?.min || MIN;
-      let categories = req.query?.categories.split(",") || [];
+      let searchQ = checkUndefinedOrNull(req.query?.s) ? "" : req.query.s;
+      let max = checkUndefinedOrNull(req.query?.max) ? MAX : req.query.max;
+      let min = checkUndefinedOrNull(req.query?.min) ? MIN : req.query?.min;
+      let categories = checkUndefinedOrNull(req.query?.categories)
+        ? null
+        : req.query?.categories.split(",");
       let searchReg = new RegExp(searchQ, "i");
-      console.log(categories);
       let posts = await PostModel.find({
         title: searchReg,
         price: { $gte: min, $lt: max },
