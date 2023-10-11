@@ -151,16 +151,23 @@ exports.postCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-      let searchQ = checkUndefinedOrNull(req.query?.s) ? "" : req.query.s;
+      console.log(req.query?.searchQ);
+      // query params
+      let searchQ = checkUndefinedOrNull(req.query?.searchQ)
+        ? ""
+        : req.query.searchQ;
       let max = checkUndefinedOrNull(req.query?.max) ? MAX : req.query.max;
       let min = checkUndefinedOrNull(req.query?.min) ? MIN : req.query?.min;
       let categories = checkUndefinedOrNull(req.query?.categories)
         ? null
         : req.query?.categories.split(",");
+      console.log(`search - ${searchQ}`);
+      // regex search ignore case sensitive
       let searchReg = new RegExp(searchQ, "i");
       let posts = await PostModel.find({
-        title: searchReg,
+        title: { $regex: searchReg },
         price: { $gte: min, $lt: max },
+        category_url: { $in: categories },
       })
         .limit(perPage)
         .skip((page - 1) * perPage)
