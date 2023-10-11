@@ -14,17 +14,22 @@ require("./db/mongoconnect");
 
 const app = express();
 
+// configuration urls to orgin
+const originUrls = [
+  "https://rentinout.onrender.com",
+  "http://rentinout.onrender.com",
+  "http://localhost:3000",
+  "https://rentinout.netlify.app",
+  "http://rentinout.netlify.app",
+  "http://localhost:5173",
+  "https://rent-in-out.netlify.app",
+  "https://rent-in-out-front.vercel.app",
+  "http://localhost:3001",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://rentinout.onrender.com",
-      "http://rentinout.onrender.com",
-      "http://localhost:3000",
-      "https://rentinout.netlify.app",
-      "http://localhost:5173",
-      "https://rent-in-out.netlify.app",
-      "https://rent-in-out-front.vercel.app",
-    ],
+    origin: originUrls,
     credentials: true,
   })
 );
@@ -40,16 +45,7 @@ const server = http.createServer(app);
 //socket io
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://rentinout.onrender.com",
-      "http://rentinout.onrender.com",
-      "http://localhost:3000",
-      "https://rentinout.netlify.app",
-      "http://localhost:3001",
-      "http://localhost:5173",
-      "https://rent-in-out.netlify.app",
-      "https://rent-in-out-front.vercel.app",
-    ],
+    origin: originUrls,
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
