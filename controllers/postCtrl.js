@@ -151,7 +151,6 @@ exports.postCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-      console.log(req.query?.searchQ);
       // query params
       let searchQ = checkUndefinedOrNull(req.query?.searchQ)
         ? ""
@@ -161,19 +160,29 @@ exports.postCtrl = {
       let categories = checkUndefinedOrNull(req.query?.categories)
         ? null
         : req.query?.categories.split(",");
-      console.log(`search - ${searchQ}`);
       // regex search ignore case sensitive
       let searchReg = new RegExp(searchQ, "i");
-      let posts = await PostModel.find({
-        title: { $regex: searchReg },
-        price: { $gte: min, $lt: max },
-        category_url: { $in: categories },
-      })
-        .limit(perPage)
-        .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse })
-        .populate({ path: "likes", select })
-        .populate({ path: "creator_id", select });
+      let posts;
+      posts = categories?.length
+        ? await PostModel.find({
+            title: { $regex: searchReg },
+            price: { $gte: min, $lt: max },
+            category_url: { $in: categories },
+          })
+            .limit(perPage)
+            .skip((page - 1) * perPage)
+            .sort({ [sort]: reverse })
+            .populate({ path: "likes", select })
+            .populate({ path: "creator_id", select })
+        : await PostModel.find({
+            title: { $regex: searchReg },
+            price: { $gte: min, $lt: max },
+          })
+            .limit(perPage)
+            .skip((page - 1) * perPage)
+            .sort({ [sort]: reverse })
+            .populate({ path: "likes", select })
+            .populate({ path: "creator_id", select });
       res.json({ count: posts.length, posts });
     } catch (err) {
       res.status(500).json({ err: err });

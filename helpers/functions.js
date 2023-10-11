@@ -3,6 +3,7 @@ exports.checkUndefinedOrNull = (value) => {
     value === undefined ||
     value === null ||
     value === "undefined" ||
-    value === "null"
+    value === "null" ||
+    value === ""
   );
 };
