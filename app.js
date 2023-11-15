@@ -1,14 +1,13 @@
 const express = require("express");
-require("./helpers/passport");
 const path = require("path");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const passport = require("passport");
 const session = require("express-session");
 const fileUpload = require("express-fileupload");
 const { routesInit } = require("./routers/config_routes");
 const { sockets } = require("./routers/socket");
+
 require("dotenv").config();
 require("./db/mongoconnect");
 
@@ -36,8 +35,6 @@ app.use(
 app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }));
 app.use(express.json());
 app.use(session({ secret: "cats" }));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 routesInit(app);
 
