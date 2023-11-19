@@ -44,6 +44,7 @@ exports.authCtrl = {
     }
   },
   login: async (req, res) => {
+    if (req.body.token) return this.authCtrl.loginGmail(req, res);
     const validBody = validateUserLogin(req.body);
     if (validBody.error)
       return res.status(401).json({ msg: validBody.error.details });
