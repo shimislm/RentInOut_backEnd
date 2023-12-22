@@ -22,7 +22,7 @@ router.post("/clientEmail", mailMe.sendEmail);
 
 router.get("/userList", authAdmin, userCtrl.getUsersList);
 router.get("/userSearch", userCtrl.userSearch);
-router.get("/countUsers", authAdmin, userCtrl.countUsers);
+router.get("/count", authAdmin, userCtrl.countUsers);
 router.get("/info/:id", userCtrl.infoById);
 router.get("/infoToken/:id", auth, userCtrl.infoByIdWithToken);
 router.get("/getRank/:userID", userCtrl.avgRank);

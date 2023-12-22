@@ -101,7 +101,7 @@ exports.categoryCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  countCategory: async (req, res) => {
+  count: async (req, res) => {
     try {
       let count = await CategoryModel.countDocuments({});
       res.json({ count });
@@ -109,5 +109,5 @@ exports.categoryCtrl = {
       console.error(err);
       res.status(500).json({ msg: "err", err });
     }
-  },
+  }
 };
