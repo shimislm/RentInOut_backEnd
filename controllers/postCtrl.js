@@ -165,24 +165,24 @@ exports.postCtrl = {
       let posts;
       posts = categories?.length
         ? await PostModel.find({
-            title: { $regex: searchReg },
-            price: { $gte: min, $lt: max },
-            category_url: { $in: categories },
-          })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })
-            .populate({ path: "likes", select })
-            .populate({ path: "creator_id", select })
+          title: { $regex: searchReg },
+          price: { $gte: min, $lt: max },
+          category_url: { $in: categories },
+        })
+          .limit(perPage)
+          .skip((page - 1) * perPage)
+          .sort({ [sort]: reverse })
+          .populate({ path: "likes", select })
+          .populate({ path: "creator_id", select })
         : await PostModel.find({
-            title: { $regex: searchReg },
-            price: { $gte: min, $lt: max },
-          })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })
-            .populate({ path: "likes", select })
-            .populate({ path: "creator_id", select });
+          title: { $regex: searchReg },
+          price: { $gte: min, $lt: max },
+        })
+          .limit(perPage)
+          .skip((page - 1) * perPage)
+          .sort({ [sort]: reverse })
+          .populate({ path: "likes", select })
+          .populate({ path: "creator_id", select });
       res.json({ count: posts.length, posts });
     } catch (err) {
       res.status(500).json({ err: err });
@@ -354,4 +354,30 @@ exports.postCtrl = {
     });
     return res.json({ msg: "delete all images succeed" });
   },
+  countByCategory: async (req, res) => {
+    try {
+      const countMap = {};
+      let posts = await PostModel.find({});
+      let arrayOfCategories = posts.map(post => post.category_url);
+
+      // Count occurrences of each item
+      arrayOfCategories.forEach(category => {
+        if (countMap[category]) {
+          countMap[category] += 1;
+        } else {
+          countMap[category] = 1;
+        }
+      });
+
+      // Convert the countMap to an array of objects
+      const catogoriesCount = Object.keys(countMap).map(key => {
+        return { name: key, count: countMap[key] };
+      });
+
+      return res.json(catogoriesCount);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  }
 };

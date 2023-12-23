@@ -2,7 +2,6 @@ const { UserModel } = require("../models/userModel");
 const { config } = require("../config/config");
 const { validateUser } = require("../validations/userValid");
 const { createToken, select } = require("../helpers/userHelper");
-const { PostModel } = require("../models/postModel");
 const cloudinary = require("cloudinary").v2;
 
 exports.userCtrl = {
@@ -334,4 +333,34 @@ exports.userCtrl = {
       res.status(500).json({ err: err });
     }
   },
+  getUsersCountByDate: async (req, res) => {
+    let data = await UserModel.find(
+      { _id: { $ne: config.superID } },
+      { password: 0 }
+    );
+    // map created at from each user
+    const usersCreatedDates = data.map(user => user.createdAt);
+    // sort the dates
+    const sortedUsersCreatedDates = usersCreatedDates.sort();
+
+    const now = Date.now();
+    const threeYearsAgo = now - (3 * 365 * 24 * 60 * 60 * 1000); // 3 years in milliseconds
+    const halfYear = 182.5 * 24 * 60 * 60 * 1000; // half year in milliseconds
+    let intervals = [];
+
+    // Generate half-year intervals for the last 3 years
+    for (let date = threeYearsAgo; date <= now; date += halfYear) {
+      intervals.push(date);
+    }
+
+    // Count occurrences for each interval
+    const result = intervals.map(endDate => {
+      return {
+        date: endDate,
+        count: sortedUsersCreatedDates.filter(ts => ts <= endDate).length
+      };
+    });
+
+    return res.json(result);
+  }
 };
