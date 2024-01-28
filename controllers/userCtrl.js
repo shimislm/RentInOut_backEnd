@@ -74,7 +74,6 @@ exports.userCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-
   changeRole: async (req, res) => {
     try {
       let userID = req.params.userID;
@@ -96,7 +95,6 @@ exports.userCtrl = {
       return res.status(500).json({ msg: "err", err });
     }
   },
-
   changeActive: async (req, res) => {
     try {
       let userID = req.params.userID;
@@ -118,7 +116,6 @@ exports.userCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-
   delete: async (req, res) => {
     try {
       let idDel = req.params.idDel;
@@ -163,7 +160,6 @@ exports.userCtrl = {
           req.body
         );
       }
-      // else{ throw new Error}
       return res.status(200).json(user);
     } catch (err) {
       console.error(err);
@@ -308,7 +304,6 @@ exports.userCtrl = {
       return res.json({ result });
     });
   },
-
   getUserWishList: async (req, res) => {
     let user = await UserModel.findOne({ _id: req.tokenData._id })
       .populate({

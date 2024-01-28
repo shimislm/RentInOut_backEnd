@@ -3,26 +3,28 @@ const { UserModel } = require("../models/userModel");
 
 exports.socketCtrl = {
   chatUpdate: async (req, res) => {
-    let message = await UserModel.findOne({ _id: req.body.userID }).populate({
-      path: "messages",
-      select: "roomID",
-    });
     try {
-      if (
-        !message.messages.some((el) => el.roomID === req.body.messageObj.roomID)
-      ) {
-        let newMessage = new MessageModel(req.body.messageObj);
+      const message = await UserModel.findOne({ _id: req.body.userID }).populate({
+        path: "messages",
+        select: "roomID",
+      });
+
+      if (!message.messages.some((el) => el.roomID === req.body.messageObj.roomID)) {
+        const newMessage = new MessageModel(req.body.messageObj);
         newMessage.save();
+
         let user = await UserModel.updateOne(
           { _id: req.body.userID },
           { $push: { messages: newMessage._id } }
         );
+
         let creator = await UserModel.updateOne(
           { _id: req.body.creatorID },
           { $push: { messages: newMessage._id } }
         );
         return res.status(200).json({ user, creator });
-      } else {
+      }
+      else {
         let message = await MessageModel.findOneAndUpdate(
           { roomID: req.body.messageObj.roomID },
           { messagesArr: req.body.messageObj.messagesArr }
@@ -45,7 +47,7 @@ exports.socketCtrl = {
         let messages = message.messages.filter((msg) => msg.roomID === roomID);
         return res.status(200).json(messages);
       } catch (err) {
-        res.status(500).json({ err: err });
+        return res.status(500).json({ err: err });
       }
     } else return res.status(404).json({ msg: "Chat not found" });
   },
@@ -54,14 +56,7 @@ exports.socketCtrl = {
       path: "messages",
     });
     try {
-      let messages = message.messages.sort(function (a, b) {
-        var keyA = new Date(a.updatedAt),
-          keyB = new Date(b.updatedAt);
-        // Compare the 2 dates
-        if (keyA > keyB) return -1;
-        if (keyA < keyB) return 1;
-        return 0;
-      });
+      let messages = message.messages.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       return res.status(200).json(messages);
     } catch (err) {
       res.status(500).json({ err: err });
@@ -72,7 +67,7 @@ exports.socketCtrl = {
     let roomID = req.params.roomID;
     try {
       let chat = await MessageModel.findOne({ roomID: roomID });
-      chat.messagesArr.splice(msgID, 1);
+      chat.messagesArr = chat.messagesArr.filter(message => String(message._id) !== msgID);
       await chat.save();
 
       if (chat.messagesArr.length < 1) {
@@ -84,6 +79,7 @@ exports.socketCtrl = {
             (msg) => String(msg._id) !== String(chat._id)
           );
           await owner.save();
+
           let user = await UserModel.findById(req.tokenData._id).populate({
             path: "messages",
           });
@@ -91,6 +87,7 @@ exports.socketCtrl = {
             (msg) => String(msg._id) !== String(chat._id)
           );
           await user.save();
+
           await MessageModel.deleteOne({ _id: chat._id });
           return res.status(200).json({ user, owner });
         } catch (err) {

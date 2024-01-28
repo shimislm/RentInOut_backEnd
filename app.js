@@ -3,8 +3,6 @@ const path = require("path");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const session = require("express-session");
-const fileUpload = require("express-fileupload");
 const { routesInit } = require("./routers/config_routes");
 const { sockets } = require("./routers/socket");
 
@@ -32,9 +30,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 } }));
 app.use(express.json());
-app.use(session({ secret: "cats" }));
 app.use(express.static(path.join(__dirname, "public")));
 routesInit(app);
 

@@ -3,7 +3,7 @@ const { auth, authAdmin } = require("../middlewares/auth");
 const router = express.Router();
 const { userCtrl } = require("../controllers/userCtrl");
 const { authCtrl } = require("../controllers/authCtrl");
-const { mailMe } = require("../controllers/sendEmail");
+const { emailCtrl } = require("../controllers/sendEmail");
 const { socketCtrl } = require("../controllers/socketCtrl");
 
 //google signIn
@@ -18,7 +18,7 @@ router.post("/", authCtrl.signUp);
 router.post("/login", authCtrl.login);
 router.post("/requestPasswordReset", authCtrl.requestPasswordReset);
 router.post("/resetPassword", authCtrl.resetPassword);
-router.post("/clientEmail", mailMe.sendEmail);
+router.post("/clientEmail", emailCtrl.sendEmail);
 // authonication routes - end
 
 // user routes

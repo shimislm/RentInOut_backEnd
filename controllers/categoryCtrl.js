@@ -1,28 +1,30 @@
 const { select } = require("../helpers/userHelper");
 const { CategoryModel } = require("../models/categoryModel");
 const { validateCategory } = require("../validations/categoryValid");
-const MAX = 10000000;
-const MIN = 0;
 
 exports.categoryCtrl = {
   getCategorylist: async (req, res) => {
+    // query params
     let sort = req.query.sort || "name";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
       let data = await CategoryModel.find({})
         .sort({ [sort]: reverse })
         .populate({ path: "creator_id", select })
         .populate({ path: "editor_id", select });
-      return res.json(data);
+      return res.status(200).json(data);
     } catch (err) {
       return res.status(500).json({ msg: "there error try again later", err });
     }
   },
   search: async (req, res) => {
+    // query params
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
       let searchQ = req.query?.s;
       let searchReg = new RegExp(searchQ, "i");
@@ -48,6 +50,7 @@ exports.categoryCtrl = {
   },
 
   addCategory: async (req, res) => {
+    // check validation
     let validBody = validateCategory(req.body);
     if (validBody.error) {
       res.status(400).json(validBody.error.details);
@@ -73,6 +76,7 @@ exports.categoryCtrl = {
   },
 
   editCategory: async (req, res) => {
+    // check validation
     let validBody = validateCategory(req.body);
     if (validBody.error) {
       res.status(400).json(validBody.error.details);
@@ -83,7 +87,7 @@ exports.categoryCtrl = {
       let category = await CategoryModel.findOne({ _id: idEdit });
       category.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
       category.editor_id = req.tokenData._id;
-      category.save();
+      await category.save();
       res.json({ category });
     } catch (err) {
       console.error(err);

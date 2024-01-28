@@ -24,6 +24,7 @@ exports.authCtrl = {
     }
     try {
       let user = new UserModel(req.body);
+      // crypt the password with bcrypt
       user.password = await bcrypt.hash(user.password, saltRounds);
       user.email = user.email.toLowerCase();
       await user.save();
@@ -46,11 +47,12 @@ exports.authCtrl = {
   login: async (req, res) => {
     if (req.body.token) return this.authCtrl.loginGmail(req, res);
     const validBody = validateUserLogin(req.body);
+    // check if joi returned any errors
     if (validBody.error)
       return res.status(401).json({ msg: validBody.error.details });
     try {
       const user = await UserModel.findOne({
-        email: req.body.email.toLowerCase(),
+        email: req.body.email.trim().toLowerCase(),
       });
       if (!user) return res.status(401).json({ msg: "User not found" });
       const validPass = await bcrypt.compare(req.body.password, user.password);
@@ -60,7 +62,7 @@ exports.authCtrl = {
       if (!active) {
         return res
           .status(401)
-          .json({ msg: "User blocked/ need to verify your email" });
+          .json({ msg: "User blocked / need to verify your email" });
       }
       let newAccessToken = createToken(user._id, user.role);
       return res.json({ token: newAccessToken, user });
@@ -73,17 +75,16 @@ exports.authCtrl = {
     let { userId, uniqueString } = req.params;
     try {
       const user = await UserVerificationModel.findOne({ userId });
-      //check if user exist in system
-      const { expiresAt } = user;
-      const hashedUniqueString = user.uniqueString;
+      // check if user exist in system
       if (user) {
-        //checkes if link expired and sent a messege, delete verify collection in db
-        if (expiresAt < Date.now() + 2 * 60 * 60 * 1000) {
+        // checkes if link expired and sent a messege, delete verify collection in db
+        if (user.expiresAt < Date.now() + 2 * 60 * 60 * 1000) {
           try {
             // if expired delete verify collection
             await UserVerificationModel.deleteOne({ userId });
             await UserModel.deleteOne({ _id: userId });
-            let message = "Link has expired. please sigh up again ";
+
+            let message = "Link has expired. please sigh up again";
             res.redirect(`/users/verified/?error=true&message=${message}`);
           } catch (error) {
             let message =
@@ -93,7 +94,7 @@ exports.authCtrl = {
               .json({ msg: `/users/verified/?error=true&message=${message}` });
           }
         } else {
-          let result = await bcrypt.compare(uniqueString, hashedUniqueString);
+          let result = await bcrypt.compare(uniqueString, user.uniqueString);
           if (result) {
             try {
               // update user to active state
@@ -107,13 +108,13 @@ exports.authCtrl = {
                 res.sendFile(path.join(__dirname, "./../views/verified.html"));
               } else {
                 // fail on update user collection
-                let message = "an error occurre while updating user verified ";
+                let message = "an error occurre while updating user verified";
                 res.status(401).json({
                   msg: `/users/verified/?error=true&message=${message}`,
                 });
               }
             } catch {
-              // couldnt verify user details
+              // couldn't verify user details
               await UserVerificationModel.deleteOne({ userId });
               await UserModel.deleteOne({ _id: userId });
               let message =
@@ -121,7 +122,7 @@ exports.authCtrl = {
               res.redirect(`/users/verified/?error=true&message=${message}`);
             }
           } else {
-            //couldnt verify unique string
+            // couldn't verify unique string
             await UserVerificationModel.deleteOne({ userId });
             await UserModel.deleteOne({ _id: userId });
             let message =
@@ -139,9 +140,9 @@ exports.authCtrl = {
       }
     } catch (error) {
       // user verification record not found in DB
-      let delVer = await UserVerificationModel.deleteOne({ uniqueString });
+      await UserVerificationModel.deleteOne({ uniqueString });
       let message =
-        "an error occurre while checking for existing user Verification record ";
+        "an error occurre while checking for existing user Verification record";
       res.redirect(`/users/verified/?error=true&message=${message}`);
     }
   },
@@ -150,26 +151,23 @@ exports.authCtrl = {
   },
   requestPasswordReset: async (req, res) => {
     const { email, redirectUrl } = req.body;
-    UserModel.findOne({ email }).then((data) => {
-      if (data) {
-        // check if user is active
-        if (!data.active) {
-          res.json({
-            status: "failed",
-            message:
-              "Email isn't verified yet or account as been suspended, please check your email",
-          });
-        } else {
-          // procced to email reset pasword
-          sendResetEmail(data, redirectUrl, res);
-        }
-      } else {
-        res.json({
-          status: "failed",
-          message: "No account with the supplied email found. Please try again",
+    const data = await UserModel.findOne({ email });
+
+    if (data) {
+      // check if user is active
+      if (!data.active) {
+        res.status(403).json({
+          message: "Email isn't verified yet or account as been suspended, please check your email",
         });
+      } else {
+        // procced to email reset pasword
+        sendResetEmail(data, redirectUrl, res);
       }
-    });
+    } else {
+      res.status(404).json({
+        message: "No account with the supplied email found. Please try again",
+      });
+    }
   },
   resetPassword: async (req, res) => {
     const { userId, resetString, newPassword } = req.body;
@@ -187,7 +185,7 @@ exports.authCtrl = {
               .json({ msg: "Password reset link as expired", err });
           }
         } else {
-          //compare reset string with string from db
+          // compare reset string with string from db
           let result = await bcrypt.compare(resetString, hashedResetString);
           if (result) {
             const hashedNewPassword = await bcrypt.hash(
@@ -213,19 +211,19 @@ exports.authCtrl = {
                   });
                 } else {
                   return res
-                    .status(401)
+                    .status(400)
                     .json({ msg: "Failed to update user password", error });
                 }
               }
             }
           } else {
-            return res.status(401).json({ msg: "Invalid password details" });
+            return res.status(403).json({ msg: "Invalid password details" });
           }
         }
       } else {
         // password reset request not found
         return res
-          .status(401)
+          .status(404)
           .json({ msg: "Password reset request not found" });
       }
     } catch (error) {

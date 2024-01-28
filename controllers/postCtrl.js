@@ -5,15 +5,18 @@ const { PostModel } = require("../models/postModel");
 const { UserModel } = require("../models/userModel");
 const { validatePost } = require("../validations/postValid");
 const cloudinary = require("cloudinary").v2;
+
 const MAX = 10000000;
 const MIN = 0;
 
 exports.postCtrl = {
   getAll: async (req, res) => {
+    // query params
     let perPage = Math.min(req.query.perPage, 20) || 15;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
       let posts = await PostModel.find({})
         .sort({ [sort]: reverse })
@@ -27,7 +30,9 @@ exports.postCtrl = {
     }
   },
   postByID: async (req, res) => {
+    // params
     let postID = req.params.postID;
+
     try {
       const post = await PostModel.findById(postID).populate({
         path: "creator_id",
@@ -95,7 +100,7 @@ exports.postCtrl = {
     // for each image delete from cloudinary to save memory space
     const deleteCloudinaryImages = () => {
       post.img.forEach((img) => {
-        cloudinary.uploader.destroy(img.img_id, details, (error, result) => {
+        cloudinary.uploader.destroy(img.img_id, details, (error) => {
           if (error) return res.json({ error });
         });
       });
@@ -145,6 +150,7 @@ exports.postCtrl = {
     }
   },
   search: async (req, res) => {
+    // query params
     let perPage = Math.min(req.query.perPage, 20) || 15;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
@@ -163,6 +169,7 @@ exports.postCtrl = {
       // regex search ignore case sensitive
       let searchReg = new RegExp(searchQ, "i");
       let posts;
+      // TODO - should check how to do it better 
       posts = categories?.length
         ? await PostModel.find({
           title: { $regex: searchReg },
@@ -191,7 +198,7 @@ exports.postCtrl = {
   changeActive: async (req, res) => {
     try {
       let postID = req.params.postID;
-      if (postID == config.superID) {
+      if (postID === config.superID) {
         return res
           .status(401)
           .json({ msg: "You cant change superadmin to user" });
@@ -199,7 +206,7 @@ exports.postCtrl = {
       let post = await PostModel.findOne({ _id: postID });
       post.active = !post.active;
       post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
-      post.save();
+      await post.save();
 
       return res.json(post);
     } catch (err) {
@@ -207,10 +214,12 @@ exports.postCtrl = {
     }
   },
   userPosts: async (req, res) => {
+    // query params
     let perPage = Math.min(req.query.perPage, 20) || 10;
     let page = req.query.page || 1;
     let sort = req.query.sort || "createdAt";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
       let id = req.params.userID;
       let posts = await PostModel.find({ creator_id: id })
@@ -249,19 +258,17 @@ exports.postCtrl = {
           { range: req.body.range }
         );
       }
-      //update the change time
+      // update the change time
       let post = await PostModel.findOne({ _id: postID });
       post.updatedAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
-      post.save();
+      await post.save();
       return res.json(data);
     } catch (err) {
       res.status(500).json({ msg: "err", err });
     }
   },
   likePost: async (req, res) => {
-    // find user by id
     let user = await UserModel.findById(req.tokenData._id);
-    // get post from query params
     let postID = req.params.postID;
     // find the current post by id and get likes object from ID by populate
     let post = await PostModel.findOne({ _id: postID })
@@ -271,7 +278,6 @@ exports.postCtrl = {
     // if the user found in the array setup found true else false
     const found = post.likes.some((el) => String(el.id) === req.tokenData._id);
     if (!found) {
-      // add to array of likes
       post.likes.unshift(req.tokenData._id);
       await post.save();
 
@@ -284,19 +290,24 @@ exports.postCtrl = {
         user.wishList.unshift(post._id);
         await user.save();
       }
+
+      post = await PostModel.findOne({ _id: postID })
+        .populate({ path: "likes", select })
+        .populate({ path: "creator_id", select });
       return res
         .status(201)
         .json({ posts: post.likes, post: post, msg: "You like the post" });
     }
 
     // remove from post like the user.
-    post.likes = post.likes.filter((e) => String(e._id) !== req.tokenData._id);
+    const index = post.likes.findIndex((e) => String(e._id) === req.tokenData._id);
+    post.likes.splice(index, 1);
     await post.save();
 
     // wish list remove item
     user.wishList = user.wishList.filter((el) => String(el) !== postID);
     await user.save();
-    res.status(201).json({ posts: post.likes, msg: "unlike the post" });
+    res.status(201).json({ posts: post.likes, post: post, msg: "unlike the post" });
   },
   countLikes: async (req, res) => {
     try {
@@ -349,10 +360,10 @@ exports.postCtrl = {
       img.img_id !== imgID;
     });
     await post.save();
-    cloudinary.uploader.destroy(imgID, details, (error, result) => {
-      if (error) return res.json({ error });
+    cloudinary.uploader.destroy(imgID, details, (error) => {
+      if (error) return res.status(400).json({ error });
     });
-    return res.json({ msg: "delete all images succeed" });
+    return res.status(201).json({ msg: "delete all images succeed" });
   },
   countByCategory: async (req, res) => {
     try {
